@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SATs practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Lexend:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EAF3F1; --card:#FFFFFF; --ink:#12343A; --muted:#4E6A6F; --rule:#CFE0DC;
+  --teal:#0E7B7F; --teal-soft:#D3ECEA; --sun:#FFC93C; --sun-soft:#FFF1C7;
+  --right:#1D8656; --right-soft:#DDF2E6; --wrong:#C93C3C; --wrong-soft:#FBE3E1;
+  --key:#F4F9F8;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1D20; --card:#16282C; --ink:#E4F1EF; --muted:#9DB8B4; --rule:#28403F;
+    --teal:#5CC6C9; --teal-soft:#173A3C; --sun:#FFD25E; --sun-soft:#3A3115;
+    --right:#5DD39A; --right-soft:#163526; --wrong:#F48A86; --wrong-soft:#3C1E1D; --key:#1C3337;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1D20; --card:#16282C; --ink:#E4F1EF; --muted:#9DB8B4; --rule:#28403F;
+  --teal:#5CC6C9; --teal-soft:#173A3C; --sun:#FFD25E; --sun-soft:#3A3115;
+  --right:#5DD39A; --right-soft:#163526; --wrong:#F48A86; --wrong-soft:#3C1E1D; --key:#1C3337;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 "Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:"Fredoka","Lexend",system-ui,sans-serif;margin:0;line-height:1.15}
+h1{font-size:2.1rem;font-weight:700}
+h2{font-size:1.5rem;font-weight:700}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 40px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.btn{appearance:none;border:0;border-radius:14px;background:var(--teal);color:#fff;font-weight:700;padding:12px 22px;min-height:52px;cursor:pointer;font-size:1.05rem}
+.btn.alt{background:var(--card);color:var(--ink);border:2px solid var(--rule)}
+.btn.sun{background:var(--sun);color:#3B2B00}
+.btn:disabled{opacity:.5}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.back{appearance:none;border:0;background:none;color:var(--teal);font-weight:700;padding:8px 0;cursor:pointer;min-height:44px}
+
+/* home */
+.hello{margin-bottom:22px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tile{appearance:none;text-align:left;border:0;border-radius:22px;padding:22px;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;gap:8px;min-height:170px}
+.tile.maths{background:var(--sun)}
+.tile.spell{background:var(--teal-soft)}
+.tile .big{font-family:"Fredoka",system-ui,sans-serif;font-size:1.9rem;font-weight:700}
+.tile .sym{font-family:"Fredoka",system-ui,sans-serif;font-size:2.6rem;font-weight:700;line-height:1;opacity:.85}
+.tile.maths{color:#3B2B00}
+.log{margin-top:28px}
+.log h2{font-size:1.2rem;margin-bottom:8px}
+.log ul{list-style:none;margin:0;padding:0;background:var(--card);border-radius:16px;border:1px solid var(--rule)}
+.log li{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--rule)}
+.log li:first-child{border-top:0}
+
+/* setup */
+.panel{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--rule)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.chip{appearance:none;border:2px solid var(--rule);background:var(--key);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:44px;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* question */
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}
+.progress{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin-bottom:18px}
+.progress div{height:100%;background:var(--teal)}
+.qcard{background:var(--card);border-radius:22px;padding:26px 18px;border:1px solid var(--rule);text-align:center}
+.qtext{font-family:"Fredoka",system-ui,sans-serif;font-weight:600;font-size:2.2rem;line-height:1.3;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:.25em .35em;font-variant-numeric:tabular-nums}
+.fr{display:inline-flex;align-items:center;gap:.15em}
+.fr .st{display:inline-flex;flex-direction:column;align-items:center;font-size:.8em;line-height:1.05}
+.fr .st span:first-child{border-bottom:3px solid currentColor;padding:0 .12em}
+.answer{margin:20px auto 0;min-height:66px;max-width:420px;border:3px solid var(--rule);border-radius:16px;display:flex;align-items:center;justify-content:center;
+  font-family:"Fredoka",system-ui,sans-serif;font-size:2rem;font-weight:600;background:var(--key);padding:6px 12px;word-break:break-all}
+.answer.ph{color:var(--muted);font-size:1.1rem;font-family:"Lexend",system-ui,sans-serif;font-weight:400}
+.answer.ok{border-color:var(--right);background:var(--right-soft)}
+.answer.no{border-color:var(--wrong);background:var(--wrong-soft)}
+.feedback{margin-top:14px;min-height:30px;font-weight:700}
+.feedback.ok{color:var(--right)}
+.feedback.no{color:var(--wrong)}
+.keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px auto 0;max-width:420px}
+.keypad button{appearance:none;border:2px solid var(--rule);background:var(--card);border-radius:14px;min-height:62px;font-family:"Fredoka",system-ui,sans-serif;font-size:1.6rem;font-weight:600;cursor:pointer;touch-action:manipulation}
+.keypad button.wide{grid-column:span 2;font-size:1.05rem;font-family:"Lexend",system-ui,sans-serif}
+.keypad button.go{background:var(--teal);color:#fff;border-color:var(--teal);font-size:1.15rem;font-family:"Lexend",system-ui,sans-serif}
+.keypad button:active{transform:translateY(1px)}
+.hint{margin-top:10px}
+
+/* spelling */
+.speak{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.spellin{display:block;width:100%;max-width:420px;margin:20px auto 0;border:3px solid var(--rule);border-radius:16px;background:var(--key);
+  padding:14px;font-family:"Lexend",system-ui,sans-serif;font-size:1.7rem;text-align:center}
+.spellin.ok{border-color:var(--right);background:var(--right-soft)}
+.spellin.no{border-color:var(--wrong);background:var(--wrong-soft)}
+.cmp{margin-top:12px;font-size:1.3rem}
+.cmp mark{background:var(--sun-soft);color:var(--ink);border-bottom:3px solid var(--sun);padding:0 1px}
+
+/* summary */
+.summary{background:var(--card);border-radius:22px;padding:24px;border:1px solid var(--rule)}
+.summary .big{font-family:"Fredoka",system-ui,sans-serif;font-size:3.4rem;font-weight:700;line-height:1}
+.summary .big span{font-size:1.4rem;color:var(--muted)}
+.summary dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:16px 0}
+.summary dt{color:var(--muted)}
+.summary dd{margin:0;font-weight:500}
+textarea{width:100%;min-height:80px;border:2px solid var(--rule);border-radius:12px;background:var(--key);padding:10px;font:inherit;font-size:1rem}
+@media (max-width:480px){
+  h1{font-size:1.7rem}
+  .qtext{font-size:1.8rem}
+  .keypad button{min-height:56px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .progress div{transition:width .3s ease}
+}
+</style>
+</head>
+<body>
+<div class="wrap"><main id="app"></main></div>
+<script>
+(function(){
+"use strict";
+var app=document.getElementById("app");
+var KEY_LOG="satsp-log-v1", KEY_WORDS="satsp-words-v1", KEY_EXTRA="satsp-extra-v1";
+
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function load(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def;}catch(e){return def;}}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function ri(a,b){return a+Math.floor(Math.random()*(b-a+1));}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function num(b){var a;do{a=ri(1,b-1);}while(gcd(a,b)!==1);return a;}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function nowStr(){var d=new Date();return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"})+", "+d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});}
+
+/* ---------- exact fractions ---------- */
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=a%b;a=b;b=t;}return a||1;}
+function R(n,d){if(d===undefined)d=1;if(d<0){n=-n;d=-d;}var g=gcd(n,d);return {n:n/g,d:d/g};}
+function add(a,b){return R(a.n*b.d+b.n*a.d,a.d*b.d);}
+function sub(a,b){return R(a.n*b.d-b.n*a.d,a.d*b.d);}
+function mul(a,b){return R(a.n*b.n,a.d*b.d);}
+function div(a,b){return R(a.n*b.d,a.d*b.n);}
+function eq(a,b){return a.n===b.n&&a.d===b.d;}
+function dec(str){var p=String(str).split(".");var k=p[1]?p[1].length:0;return R(parseInt(p[0]+(p[1]||""),10),Math.pow(10,k));}
+function fmtInt(n){return n.toLocaleString("en-GB");}
+function decStr(r){var v=r.n/r.d;var s=v.toFixed(6).replace(/0+$/,"").replace(/\.$/,"");var parts=s.split(".");return fmtInt(parseInt(parts[0],10))+(parts[1]?"."+parts[1]:"");}
+function fracStr(r){if(r.d===1)return fmtInt(r.n);var w=Math.floor(r.n/r.d),rem=r.n-w*r.d;return (w?w+" ":"")+rem+"/"+r.d;}
+function parseAns(s){
+  s=String(s).trim().replace(/,/g,"").replace(/\s+/g," ");
+  var m;
+  if(/^-?\d+(\.\d+)?$/.test(s))return dec(s);
+  if(/^-?\.\d+$/.test(s))return dec(s.replace(".","0."));
+  if((m=s.match(/^(\d+)\/(\d+)$/))&&+m[2]>0)return R(+m[1],+m[2]);
+  if((m=s.match(/^(\d+) (\d+)\/(\d+)$/))&&+m[3]>0)return R(+m[1]*+m[3]+(+m[2]),+m[3]);
+  return null;
+}
+
+/* question tokens: strings, or {f:[whole,n,d]} for fractions */
+function F(n,d,w){return {f:[w||0,n,d]};}
+function tokHTML(t){
+  if(typeof t==="string")return "<span>"+esc(t)+"</span>";
+  var w=t.f[0],n=t.f[1],d=t.f[2];
+  return '<span class="fr">'+(w?"<span>"+w+"</span>":"")+'<span class="st"><span>'+n+'</span><span>'+d+'</span></span></span>';
+}
+function tokText(t){if(typeof t==="string")return t;return (t.f[0]?t.f[0]+" ":"")+t.f[1]+"/"+t.f[2];}
+
+/* ---------- arithmetic generators ---------- */
+var GROUPS={
+  addsub:"Adding and subtracting",
+  mult:"Multiplying",
+  divi:"Dividing",
+  decs:"Decimals",
+  pct:"Percentages",
+  frac:"Fractions",
+  order:"Order of operations and powers"
+};
+function d2(x){return (x/100).toFixed(2);}
+function d1(x){return (x/10).toFixed(1);}
+var GENS=[
+  {g:"addsub",name:"Adding whole numbers",make:function(){var a=ri(1000,99999),b=ri(100,99999);return {q:[fmtInt(a),"+",fmtInt(b),"="],ans:R(a+b)};}},
+  {g:"addsub",name:"Subtracting whole numbers",make:function(){var a=ri(10000,99999),b=ri(1000,a-1);return {q:[fmtInt(a),"−",fmtInt(b),"="],ans:R(a-b)};}},
+  {g:"addsub",name:"Missing numbers",make:function(){var a=ri(1000,9999),b=ri(100,a-1);return Math.random()<.5?{q:["□","−",fmtInt(b),"=",fmtInt(a)],ans:R(a+b)}:{q:[fmtInt(b),"+","□","=",fmtInt(a)],ans:R(a-b)};}},
+  {g:"decs",name:"Adding decimals",make:function(){var a=ri(100,9999),b=ri(10,999);var A=d2(a),B=d1(b);return {q:[A,"+",B,"="],ans:add(dec(A),dec(B)),asDec:true};}},
+  {g:"decs",name:"Subtracting decimals",make:function(){var a=ri(100,999),A=d1(a);var b=ri(10,a*10-1),B=d2(b);return {q:[A,"−",B,"="],ans:sub(dec(A),dec(B)),asDec:true};}},
+  {g:"decs",name:"Multiplying and dividing by 10, 100, 1000",make:function(){var x=d2(ri(1,9999));var p=pick([10,100,1000]);var op=Math.random()<.5?"×":"÷";var X=dec(x);return {q:[x,op,fmtInt(p),"="],ans:op==="×"?mul(X,R(p)):div(X,R(p)),asDec:true};}},
+  {g:"decs",name:"Decimal times a whole number",make:function(){var x=d2(ri(101,999));var k=ri(3,9);return {q:[x,"×",String(k),"="],ans:mul(dec(x),R(k)),asDec:true};}},
+  {g:"mult",name:"Short multiplication",make:function(){var a=ri(1000,9999),b=ri(3,9);return {q:[fmtInt(a),"×",String(b),"="],ans:R(a*b)};}},
+  {g:"mult",name:"Long multiplication",make:function(){var a=Math.random()<.5?ri(120,999):ri(1000,4999),b=ri(12,89);return {q:[fmtInt(a),"×",String(b),"="],ans:R(a*b)};}},
+  {g:"divi",name:"Short division",make:function(){var d=ri(3,9),q=ri(100,2999);return {q:[fmtInt(d*q),"÷",String(d),"="],ans:R(q)};}},
+  {g:"divi",name:"Long division",make:function(){var d=ri(12,49),q=Math.random()<.6?ri(11,99):ri(101,299);return {q:[fmtInt(d*q),"÷",String(d),"="],ans:R(q)};}},
+  {g:"pct",name:"Percentages of amounts",make:function(){
+    var p=pick([1,5,10,15,20,25,30,35,40,50,60,75,90]),N;
+    if(p===1)N=100*ri(2,40);else if(p===25||p===75)N=4*ri(10,120);else if(p%10===0)N=10*ri(4,90);else N=20*ri(2,45);
+    return {q:[p+"%","of",fmtInt(N),"="],ans:R(p*N,100),asDec:true};}},
+  {g:"frac",name:"Adding fractions",make:function(){
+    var b=pick([2,3,4,5,6]),d=b*pick([2,3]),a=num(b),c=num(d);
+    if(Math.random()<.35){var w=ri(1,3);return {q:[F(a,b,w),"+",F(c,d),"="],ans:add(R(w*b+a,b),R(c,d)),asFrac:true};}
+    if(Math.random()<.4){b=pick([2,3,4,5]);d=pick([3,5,7].filter(function(x){return x!==b;}));a=num(b);c=num(d);}
+    return {q:[F(a,b),"+",F(c,d),"="],ans:add(R(a,b),R(c,d)),asFrac:true};}},
+  {g:"frac",name:"Subtracting fractions",make:function(){
+    var b=pick([2,3,4,5,6]),d=b*pick([2,3]),a=num(b),c=num(d);
+    var x=R(a,b),y=R(c,d);
+    if(x.n*y.d<=y.n*x.d){return {q:[F(c,d,1),"−",F(a,b),"="],ans:sub(R(d+c,d),R(a,b)),asFrac:true};}
+    return {q:[F(a,b),"−",F(c,d),"="],ans:sub(x,y),asFrac:true};}},
+  {g:"frac",name:"Multiplying fractions",make:function(){
+    if(Math.random()<.5){var b=pick([3,4,5,6,8,9,10]),a=num(b),k=ri(2,12);return {q:[F(a,b),"×",String(k),"="],ans:mul(R(a,b),R(k)),asFrac:true};}
+    var b2=pick([2,3,4,5,6,7]),d=pick([2,3,4,5,8,9]),a2=num(b2),c=num(d);
+    return {q:[F(a2,b2),"×",F(c,d),"="],ans:mul(R(a2,b2),R(c,d)),asFrac:true};}},
+  {g:"frac",name:"Dividing fractions by whole numbers",make:function(){var b=pick([2,3,4,5,6,8]),a=num(b),k=ri(2,6);return {q:[F(a,b),"÷",String(k),"="],ans:div(R(a,b),R(k)),asFrac:true};}},
+  {g:"order",name:"Order of operations",make:function(){
+    var t=ri(0,3),a,b,c,e;
+    if(t===0){a=ri(10,99);b=ri(2,12);c=ri(2,12);return {q:[String(a),"+",String(b),"×",String(c),"="],ans:R(a+b*c)};}
+    if(t===1){a=ri(2,30);b=ri(2,30);c=ri(2,9);return {q:["("+a,"+",b+")","×",String(c),"="],ans:R((a+b)*c)};}
+    if(t===2){c=ri(2,9);b=c*ri(2,12);a=ri(b/c+1,150);return {q:[String(a),"−",String(b),"÷",String(c),"="],ans:R(a-b/c)};}
+    a=ri(2,12);b=ri(2,12);c=ri(2,9);e=ri(2,9);
+    if(a*b<c*e){var s=a;a=c;c=s;s=b;b=e;e=s;}
+    return {q:[String(a),"×",String(b),"−",String(c),"×",String(e),"="],ans:R(a*b-c*e)};}},
+  {g:"order",name:"Squares and cubes",make:function(){
+    var t=ri(0,2);
+    if(t===0){var n=ri(4,15),m=ri(10,200);return {q:[n+"²","+",String(m),"="],ans:R(n*n+m)};}
+    if(t===1){var k=ri(2,6);return {q:[k+"³","="],ans:R(k*k*k)};}
+    var x=ri(2,9),y=ri(2,4);return {q:[x+"²","+",y+"³","="],ans:R(x*x+y*y*y)};}}
+];
+function correctText(it){if(it.asFrac)return fracStr(it.ans);if(it.asDec)return decStr(it.ans);return fmtInt(it.ans.n);}
+
+/* ---------- spelling: statutory Year 5 and 6 word list ---------- */
+var WORDS=[
+["accommodate","The hotel can accommodate fifty guests."],["accompany","Will you accompany me to the shop?"],["according","According to the map, the river is close."],["achieve","Hard work helped her achieve her goal."],["aggressive","The dog was not aggressive at all."],
+["amateur","He is an amateur photographer."],["ancient","We visited an ancient castle."],["apparent","It was apparent that it would rain."],["appreciate","I appreciate your help."],["attached","A label was attached to the parcel."],
+["available","Tickets are available online."],["average","The average score was high."],["awkward","There was an awkward silence."],["bargain","The jacket was a bargain."],["bruise","She had a bruise on her knee."],
+["category","Choose a category for your story."],["cemetery","The church has an old cemetery."],["committee","The school committee met on Monday."],["communicate","Dolphins communicate with clicks."],["community","Our community planted new trees."],
+["competition","She entered a poetry competition."],["conscience","His conscience told him to own up."],["conscious","She was conscious of the time."],["controversy","The new rule caused controversy."],["convenience","The shop stays open late for our convenience."],
+["correspond","Pen pals correspond by letter."],["criticise","Try not to criticise people unkindly."],["curiosity","Curiosity made him open the box."],["definite","We need a definite answer."],["desperate","The traveller was desperate for water."],
+["determined","She was determined to finish the race."],["develop","Tadpoles develop into frogs."],["dictionary","Look the word up in a dictionary."],["disastrous","The flood was disastrous for the farm."],["embarrass","Please don't embarrass me in front of my friends."],
+["environment","We must protect the environment."],["equipment","Put the PE equipment away."],["especially","I love fruit, especially mangoes."],["exaggerate","Don't exaggerate the size of the fish."],["excellent","That was an excellent piece of writing."],
+["existence","Scientists argue about the existence of life on other planets."],["explanation","The teacher gave a clear explanation."],["familiar","The song sounded familiar."],["foreign","She can speak a foreign language."],["forty","There are forty children in the choir."],
+["frequently","Trains run frequently on weekdays."],["government","The government announced a new plan."],["guarantee","The watch comes with a guarantee."],["harass","Wasps sometimes harass people at picnics."],["hindrance","The heavy bag was a hindrance on the walk."],
+["identity","The spy kept his identity secret."],["immediately","Come inside immediately."],["individual","Each individual has one vote."],["interfere","Please don't interfere with the experiment."],["interrupt","It is rude to interrupt."],
+["language","French is my favourite language."],["leisure","Swimming is a popular leisure activity."],["lightning","A flash of lightning lit up the sky."],["marvellous","We had a marvellous holiday."],["mischievous","The mischievous kitten hid my sock."],
+["muscle","She pulled a muscle in her leg."],["necessary","Is it necessary to bring a coat?"],["neighbour","Our neighbour has a new puppy."],["nuisance","The noisy drill was a nuisance."],["occupy","The puzzles will occupy the children for hours."],
+["occur","Storms often occur in winter."],["opportunity","This is a great opportunity to learn."],["parliament","The parliament voted on the new law."],["persuade","Can I persuade you to stay?"],["physical","Football is a physical sport."],
+["prejudice","We should treat people without prejudice."],["privilege","It was a privilege to meet the author."],["profession","Nursing is a caring profession."],["programme","My favourite programme starts at six."],["pronunciation","Check the pronunciation of the word."],
+["queue","We waited in a long queue."],["recognise","I didn't recognise you in that hat."],["recommend","I recommend this book."],["relevant","Only include relevant facts."],["restaurant","We ate at an Italian restaurant."],
+["rhyme","Can you think of a word that will rhyme with moon?"],["rhythm","Clap along to the rhythm."],["sacrifice","He made a sacrifice to help his team."],["secretary","The school secretary answered the phone."],["shoulder","She carried the bag on her shoulder."],
+["signature","Write your signature at the bottom."],["sincerely","I sincerely hope you feel better."],["soldier","The soldier stood guard at the gate."],["stomach","My stomach was rumbling."],["sufficient","There was sufficient food for everyone."],
+["suggest","Can you suggest a title?"],["symbol","The dove is a symbol of peace."],["system","The solar system has eight planets."],["temperature","The temperature dropped below zero."],["thorough","Give your room a thorough clean."],
+["twelfth","Today is her twelfth birthday."],["variety","The shop sells a variety of sweets."],["vegetable","Carrots are my favourite vegetable."],["vehicle","A bus is a large vehicle."],["yacht","The yacht sailed across the bay."]
+];
+var GAPS=[0,1,3,7,14,30];
+
+/* ---------- speech ---------- */
+var synth=window.speechSynthesis||null;
+var voice=null;
+function pickVoice(){
+  if(!synth)return;
+  var vs=synth.getVoices()||[];
+  voice=vs.find(function(v){return v.lang==="en-GB";})||vs.find(function(v){return /^en/.test(v.lang);})||null;
+}
+if(synth){pickVoice();try{synth.onvoiceschanged=pickVoice;}catch(e){}}
+function say(parts){
+  if(!synth)return false;
+  try{synth.cancel();}catch(e){}
+  parts.forEach(function(t){
+    var u=new SpeechSynthesisUtterance(t);
+    if(voice)u.voice=voice;u.lang=voice?voice.lang:"en-GB";u.rate=.85;
+    synth.speak(u);
+  });
+  return true;
+}
+
+/* ---------- state ---------- */
+var S={view:"home"};
+var chosen=load("satsp-groups-v1",Object.keys(GROUPS));
+
+function logSession(entry){var l=load(KEY_LOG,[]);l.unshift(entry);store(KEY_LOG,l.slice(0,60));}
+
+/* ---------- home ---------- */
+function home(){
+  S={view:"home"};
+  var l=load(KEY_LOG,[]).slice(0,6);
+  var html='<div class="hello"><h1>SATs practice</h1><p class="muted">Ten minutes a day. Pick one.</p></div>'+
+    '<div class="tiles">'+
+    '<button class="tile maths" data-act="arith-setup"><span class="sym">× ÷</span><span class="big">Arithmetic</span><span>Quick-fire sums, like paper 1.</span></button>'+
+    '<button class="tile spell" data-act="spell-setup"><span class="sym">Aa</span><span class="big">Spelling</span><span>Hear a word, type it.</span></button>'+
+    '</div>';
+  if(l.length){
+    html+='<section class="log"><h2>Recent sessions</h2><ul>'+l.map(function(e){
+      return '<li><span>'+esc(e.kind)+'<br><span class="muted small">'+esc(e.when)+'</span></span><strong>'+e.score+' / '+e.total+'</strong></li>';
+    }).join("")+'</ul></section>';
+  }
+  app.innerHTML=html;
+}
+
+/* ---------- arithmetic ---------- */
+function arithSetup(){
+  S={view:"arith-setup"};
+  var chips=Object.keys(GROUPS).map(function(g){return '<button class="chip" data-act="chip" data-g="'+g+'" aria-pressed="'+(chosen.indexOf(g)>=0)+'">'+esc(GROUPS[g])+'</button>';}).join("");
+  app.innerHTML='<button class="back" data-act="home">‹ Back</button>'+
+    '<div class="panel"><h2>Arithmetic</h2><p class="muted" style="margin-top:6px">Choose what to practise.</p>'+
+    '<div class="chips">'+chips+'</div>'+
+    '<div class="row"><button class="btn" data-act="arith-go" data-n="10">10 questions</button><button class="btn alt" data-act="arith-go" data-n="20">20 questions</button></div>'+
+    '<p class="muted small" style="margin-top:14px">For fractions, type a slash, like 3/4. For a mixed number, use the space key: 1 3/4.</p></div>';
+}
+function arithStart(n,onlyNames){
+  var gens=GENS.filter(function(g){return onlyNames?onlyNames.indexOf(g.name)>=0:chosen.indexOf(g.g)>=0;});
+  if(!gens.length)gens=GENS;
+  var items=[];
+  for(var i=0;i<n;i++){var g=gens[i%gens.length];var it=g.make();it.type=g.name;items.push(it);}
+  shuffle(items);
+  S={view:"arith",items:items,i:0,input:"",right:0,missed:[],start:Date.now(),checked:false};
+  arithDraw();
+}
+function arithDraw(){
+  var it=S.items[S.i];
+  var pct=100*S.i/S.items.length;
+  app.innerHTML='<div class="qtop"><button class="back" data-act="home">‹ Stop</button><span class="muted">'+(S.i+1)+' of '+S.items.length+'</span></div>'+
+    '<div class="progress"><div style="width:'+pct+'%"></div></div>'+
+    '<div class="qcard"><div class="qtext" aria-label="'+esc(it.q.map(tokText).join(" "))+'">'+it.q.map(tokHTML).join("")+'</div>'+
+    '<div class="answer" id="ans" aria-live="polite"></div><div class="feedback" id="fb" aria-live="polite"></div></div>'+
+    '<div class="keypad" id="pad">'+
+    ["7","8","9","⌫","4","5","6","/","1","2","3","space","0","."].map(function(k){
+      if(k==="space")return '<button data-key=" " aria-label="Space for mixed numbers">␣</button>';
+      if(k==="⌫")return '<button data-key="back" aria-label="Delete">⌫</button>';
+      return '<button data-key="'+k+'">'+k+'</button>';
+    }).join("")+
+    '<button class="wide go" data-key="enter" id="go">Check</button></div>';
+  arithShow();
+}
+function arithShow(){
+  var a=document.getElementById("ans");if(!a)return;
+  if(!S.input){a.textContent="Type your answer";a.className="answer ph";}
+  else{a.textContent=S.input;a.className="answer"+(S.checked?(S.lastOk?" ok":" no"):"");}
+}
+function arithKey(k){
+  if(S.view!=="arith")return;
+  if(S.checked){if(k==="enter")arithNext();return;}
+  if(k==="back"){S.input=S.input.slice(0,-1);}
+  else if(k==="enter"){arithCheck();return;}
+  else if(S.input.length<14){S.input+=k;}
+  arithShow();
+}
+function arithCheck(){
+  if(!S.input.trim())return;
+  var it=S.items[S.i];var v=parseAns(S.input);
+  var ok=!!v&&eq(v,it.ans);
+  S.checked=true;S.lastOk=ok;
+  if(ok)S.right++;else S.missed.push(it.type);
+  arithShow();
+  var fb=document.getElementById("fb");
+  if(ok){fb.textContent=pick(["Correct.","Yes, that's it.","Spot on.","Right."]);fb.className="feedback ok";}
+  else{fb.textContent=(v?"Not quite. ":"That isn't a number I can read. ")+"The answer is "+correctText(it)+".";fb.className="feedback no";}
+  var go=document.getElementById("go");go.textContent=S.i+1<S.items.length?"Next":"See results";
+}
+function arithNext(){
+  S.i++;S.input="";S.checked=false;
+  if(S.i>=S.items.length)arithDone();else arithDraw();
+}
+function arithDone(){
+  var secs=Math.round((Date.now()-S.start)/1000),n=S.items.length,per=Math.round(secs/n);
+  var counts={};S.missed.forEach(function(t){counts[t]=(counts[t]||0)+1;});
+  var missedTypes=Object.keys(counts);
+  var when=nowStr();
+  logSession({kind:"Arithmetic",when:when,score:S.right,total:n,secs:secs,missed:missedTypes});
+  S.view="arith-done";S.redo=missedTypes;
+  app.innerHTML='<div class="summary"><p class="muted">Arithmetic, '+esc(when)+'</p>'+
+    '<p class="big" style="margin-top:8px">'+S.right+'<span> / '+n+'</span></p>'+
+    '<dl><dt>Time</dt><dd>'+Math.floor(secs/60)+' min '+(secs%60)+' s</dd><dt>Per question</dt><dd>'+per+' s (the real paper allows about 50 s)</dd>'+
+    '<dt>To work on</dt><dd>'+(missedTypes.length?missedTypes.map(function(t){return esc(t)+(counts[t]>1?" ("+counts[t]+")":"");}).join(", "):"Nothing missed")+'</dd></dl>'+
+    '<p class="muted small">Take a screenshot and send it to Dad.</p></div>'+
+    '<div class="row" style="margin-top:16px">'+(missedTypes.length?'<button class="btn sun" data-act="arith-redo">Practise the ones I missed</button>':'')+
+    '<button class="btn alt" data-act="home">Done</button></div>';
+}
+
+/* ---------- spelling ---------- */
+function allWords(){
+  var extra=load(KEY_EXTRA,[]);
+  return WORDS.concat(extra.map(function(w){return [w,""];}));
+}
+function spellSetup(){
+  S={view:"spell-setup"};
+  var prog=load(KEY_WORDS,{});
+  var words=allWords();
+  var learnt=words.filter(function(w){return prog[w[0]]&&prog[w[0]].box>=3;}).length;
+  var extra=load(KEY_EXTRA,[]);
+  app.innerHTML='<button class="back" data-act="home">‹ Back</button>'+
+    '<div class="panel"><h2>Spelling</h2>'+
+    '<p class="muted" style="margin-top:6px">You\'ll hear each word, then a sentence, then the word again. Words you get wrong come back sooner.</p>'+
+    '<p style="margin:14px 0"><strong>'+learnt+'</strong> of '+words.length+' words secure</p>'+
+    (synth?'':'<p class="feedback no">This device can\'t read words aloud. Ask someone to read them to you, or try another browser.</p>')+
+    '<button class="btn" data-act="spell-go">Start 10 words</button></div>'+
+    '<div class="panel" style="margin-top:14px"><h3>Extra words</h3>'+
+    '<p class="muted small" style="margin:6px 0 10px">Words Dad or your teacher want you to practise, separated by commas.</p>'+
+    '<textarea id="extra" autocapitalize="off" autocorrect="off" spellcheck="false">'+esc(extra.join(", "))+'</textarea>'+
+    '<div class="row" style="margin-top:10px"><button class="btn alt" data-act="extra-save">Save words</button><span class="muted small" id="exmsg"></span></div></div>';
+}
+function spellPick(){
+  var prog=load(KEY_WORDS,{}),now=Date.now();
+  var words=allWords();
+  var due=[],fresh=[],later=[];
+  words.forEach(function(w){var p=prog[w[0]];if(!p)fresh.push(w);else if(p.due<=now)due.push(w);else later.push(w);});
+  due.sort(function(a,b){return prog[a[0]].box-prog[b[0]].box;});
+  shuffle(fresh);
+  later.sort(function(a,b){return prog[a[0]].due-prog[b[0]].due;});
+  var dueTake=due.slice(0,7);
+  return shuffle(dueTake.concat(fresh.slice(0,10-dueTake.length)).concat(later).slice(0,10));
+}
+function spellStart(){
+  S={view:"spell",items:spellPick(),i:0,right:0,missed:[],checked:false};
+  spellDraw();
+}
+function spellDraw(){
+  var w=S.items[S.i];
+  app.innerHTML='<div class="qtop"><button class="back" data-act="home">‹ Stop</button><span class="muted">'+(S.i+1)+' of '+S.items.length+'</span></div>'+
+    '<div class="progress"><div style="width:'+(100*S.i/S.items.length)+'%"></div></div>'+
+    '<div class="qcard"><div class="speak"><button class="btn" data-act="hear">Hear the word</button><button class="btn alt" data-act="hear-word">Word only</button></div>'+
+    '<input class="spellin" id="sp" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type the word">'+
+    '<div class="feedback" id="fb" aria-live="polite"></div><div class="cmp" id="cmp"></div>'+
+    '<div class="row" style="justify-content:center;margin-top:14px"><button class="btn sun" data-act="spell-check" id="go">Check</button></div></div>';
+  setTimeout(function(){var i=document.getElementById("sp");if(i)i.focus();},50);
+}
+function markDiff(typed,target){
+  var out="";for(var i=0;i<target.length;i++){var c=target[i];out+=(typed[i]===c)?esc(c):"<mark>"+esc(c)+"</mark>";}return out;
+}
+function spellCheck(){
+  var inp=document.getElementById("sp");
+  var w=S.items[S.i];
+  if(S.checked){spellNext();return;}
+  var typed=inp.value.trim().toLowerCase();
+  if(!typed)return;
+  var ok=typed===w[0].toLowerCase();
+  S.checked=true;
+  var prog=load(KEY_WORDS,{});var p=prog[w[0]]||{box:0,due:0,seen:0,wrong:0};
+  p.seen++;
+  if(ok){p.box=Math.min(5,p.box+1);S.right++;}else{p.box=0;p.wrong++;S.missed.push(w[0]);}
+  p.due=Date.now()+GAPS[p.box]*86400000;
+  prog[w[0]]=p;store(KEY_WORDS,prog);
+  inp.className="spellin "+(ok?"ok":"no");inp.readOnly=true;
+  var fb=document.getElementById("fb");
+  if(ok){fb.textContent=pick(["Correct.","Spot on.","Yes, that's right."]);fb.className="feedback ok";}
+  else{fb.textContent="Not quite. Here's the correct spelling:";fb.className="feedback no";
+    document.getElementById("cmp").innerHTML=markDiff(typed,w[0]);}
+  document.getElementById("go").textContent=S.i+1<S.items.length?"Next word":"See results";
+}
+function spellNext(){
+  S.i++;S.checked=false;
+  if(S.i>=S.items.length)spellDone();else spellDraw();
+}
+function spellDone(){
+  var when=nowStr(),n=S.items.length;
+  logSession({kind:"Spelling",when:when,score:S.right,total:n,missed:S.missed});
+  S.view="spell-done";
+  app.innerHTML='<div class="summary"><p class="muted">Spelling, '+esc(when)+'</p>'+
+    '<p class="big" style="margin-top:8px">'+S.right+'<span> / '+n+'</span></p>'+
+    '<dl><dt>To learn</dt><dd>'+(S.missed.length?S.missed.map(esc).join(", "):"Nothing missed")+'</dd></dl>'+
+    '<p class="muted small">Take a screenshot and send it to Dad. These words will come back in your next sessions.</p></div>'+
+    '<div class="row" style="margin-top:16px"><button class="btn" data-act="spell-go">Another 10</button><button class="btn alt" data-act="home">Done</button></div>';
+}
+
+/* ---------- events ---------- */
+app.addEventListener("click",function(e){
+  var k=e.target.closest("[data-key]");
+  if(k){arithKey(k.dataset.key);return;}
+  var el=e.target.closest("[data-act]");if(!el)return;
+  var a=el.dataset.act;
+  if(a==="home")home();
+  else if(a==="arith-setup")arithSetup();
+  else if(a==="chip"){
+    var g=el.dataset.g,i=chosen.indexOf(g);
+    if(i>=0){if(chosen.length>1)chosen.splice(i,1);}else chosen.push(g);
+    store("satsp-groups-v1",chosen);
+    el.setAttribute("aria-pressed",String(chosen.indexOf(g)>=0));
+  }
+  else if(a==="arith-go")arithStart(+el.dataset.n);
+  else if(a==="arith-redo")arithStart(Math.max(10,S.redo.length*3),S.redo);
+  else if(a==="spell-setup")spellSetup();
+  else if(a==="spell-go")spellStart();
+  else if(a==="hear"){var w=S.items[S.i];say(w[1]?[w[0],w[1],w[0]]:[w[0],w[0]]);var i2=document.getElementById("sp");if(i2&&!S.checked)i2.focus();}
+  else if(a==="hear-word"){say([S.items[S.i][0]]);}
+  else if(a==="spell-check")spellCheck();
+  else if(a==="extra-save"){
+    var list=document.getElementById("extra").value.split(/[,\n]/).map(function(s){return s.trim().toLowerCase();})
+      .filter(function(s){return /^[a-z][a-z' -]*$/.test(s);});
+    var known=WORDS.map(function(w){return w[0];});
+    list=list.filter(function(s,i){return list.indexOf(s)===i&&known.indexOf(s)<0;});
+    store(KEY_EXTRA,list);
+    document.getElementById("exmsg").textContent=list.length?"Saved "+list.length+" word"+(list.length===1?"":"s")+".":"Saved.";
+  }
+});
+document.addEventListener("keydown",function(e){
+  if(S.view==="arith"){
+    if(/^[0-9.\/ ]$/.test(e.key)){e.preventDefault();arithKey(e.key);}
+    else if(e.key==="Backspace"){e.preventDefault();arithKey("back");}
+    else if(e.key==="Enter"){e.preventDefault();arithKey("enter");}
+  } else if(S.view==="spell"&&e.key==="Enter"){e.preventDefault();spellCheck();}
+});
+
+home();
+})();
+</script>
+</body>
+</html>
