@@ -68,6 +68,7 @@ button,input,select{font:inherit;color:inherit}
 .panel{background:var(--card);border-radius:20px;padding:20px;border:1px solid var(--rule)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
 .chip{appearance:none;border:2px solid var(--rule);background:var(--key);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:44px;font-weight:500}
+.chip:disabled{opacity:.55;cursor:not-allowed}
 .chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:#fff}
 
 /* question */
@@ -181,50 +182,155 @@ var GROUPS={
 };
 function d2(x){return (x/100).toFixed(2);}
 function d1(x){return (x/10).toFixed(1);}
+var LEVEL=1;
+var PACE=[60,57,54,51];
+function L(a){return a[LEVEL-1];}
+function dp(x,k){var s=(x/Math.pow(10,k)).toFixed(k);return s.indexOf(".")>=0?s.replace(/\.?0+$/,""):s;}
+function distinctPair(pool){var b=pick(pool),d;do{d=pick(pool);}while(d===b);return [b,d];}
+function fr(n,d,w){return R((w||0)*d+n,d);}
 var GENS=[
-  {g:"addsub",name:"Adding whole numbers",make:function(){var a=ri(1000,99999),b=ri(100,99999);return {q:[fmtInt(a),"+",fmtInt(b),"="],ans:R(a+b)};}},
-  {g:"addsub",name:"Subtracting whole numbers",make:function(){var a=ri(10000,99999),b=ri(1000,a-1);return {q:[fmtInt(a),"−",fmtInt(b),"="],ans:R(a-b)};}},
-  {g:"addsub",name:"Missing numbers",make:function(){var a=ri(1000,9999),b=ri(100,a-1);return Math.random()<.5?{q:["□","−",fmtInt(b),"=",fmtInt(a)],ans:R(a+b)}:{q:[fmtInt(b),"+","□","=",fmtInt(a)],ans:R(a-b)};}},
-  {g:"decs",name:"Adding decimals",make:function(){var a=ri(100,9999),b=ri(10,999);var A=d2(a),B=d1(b);return {q:[A,"+",B,"="],ans:add(dec(A),dec(B)),asDec:true};}},
-  {g:"decs",name:"Subtracting decimals",make:function(){var a=ri(100,999),A=d1(a);var b=ri(10,a*10-1),B=d2(b);return {q:[A,"−",B,"="],ans:sub(dec(A),dec(B)),asDec:true};}},
-  {g:"decs",name:"Multiplying and dividing by 10, 100, 1000",make:function(){var x=d2(ri(1,9999));var p=pick([10,100,1000]);var op=Math.random()<.5?"×":"÷";var X=dec(x);return {q:[x,op,fmtInt(p),"="],ans:op==="×"?mul(X,R(p)):div(X,R(p)),asDec:true};}},
-  {g:"decs",name:"Decimal times a whole number",make:function(){var x=d2(ri(101,999));var k=ri(3,9);return {q:[x,"×",String(k),"="],ans:mul(dec(x),R(k)),asDec:true};}},
-  {g:"mult",name:"Short multiplication",make:function(){var a=ri(1000,9999),b=ri(3,9);return {q:[fmtInt(a),"×",String(b),"="],ans:R(a*b)};}},
-  {g:"mult",name:"Long multiplication",make:function(){var a=Math.random()<.5?ri(120,999):ri(1000,4999),b=ri(12,89);return {q:[fmtInt(a),"×",String(b),"="],ans:R(a*b)};}},
-  {g:"divi",name:"Short division",make:function(){var d=ri(3,9),q=ri(100,2999);return {q:[fmtInt(d*q),"÷",String(d),"="],ans:R(q)};}},
-  {g:"divi",name:"Long division",make:function(){var d=ri(12,49),q=Math.random()<.6?ri(11,99):ri(101,299);return {q:[fmtInt(d*q),"÷",String(d),"="],ans:R(q)};}},
+  {g:"addsub",name:"Adding whole numbers",make:function(){
+    var top=L([99999,999999,999999,9999999]);var a=ri(1000,top),b=ri(100,top);
+    if(LEVEL>=3){var c=ri(1000,L([0,0,99999,999999]));return {q:[fmtInt(a),"+",fmtInt(b),"+",fmtInt(c),"="],ans:R(a+b+c)};}
+    return {q:[fmtInt(a),"+",fmtInt(b),"="],ans:R(a+b)};}},
+  {g:"addsub",name:"Subtracting whole numbers",make:function(){
+    var a;
+    if(LEVEL===1)a=ri(10000,99999);else if(LEVEL===2)a=ri(100000,999999);
+    else if(LEVEL===3)a=ri(1,9)*100000+ri(0,9)*1000;else a=ri(1,9)*1000000+ri(0,9)*10000;
+    var b=ri(Math.floor(a/10),a-1);return {q:[fmtInt(a),"−",fmtInt(b),"="],ans:R(a-b)};}},
+  {g:"addsub",name:"Missing numbers",make:function(){
+    var a=ri(1000,L([9999,99999,999999,9999999])),b=ri(100,a-1);
+    return Math.random()<.5?{q:["□","−",fmtInt(b),"=",fmtInt(a)],ans:R(a+b)}:{q:[fmtInt(b),"+","□","=",fmtInt(a)],ans:R(a-b)};}},
+  {g:"decs",name:"Adding decimals",make:function(){
+    var A,B,C;
+    if(LEVEL===1){A=dp(ri(100,9999),2);B=dp(ri(10,999),1);}
+    else if(LEVEL===2){A=dp(ri(1000,99999),2);B=dp(ri(100,9999),2);}
+    else if(LEVEL===3){A=dp(ri(1000,99999),3);B=dp(ri(10,999),1);}
+    else{A=dp(ri(1000,99999),3);B=dp(ri(100,9999),2);C=String(ri(2,99));
+      return {q:[A,"+",B,"+",C,"="],ans:add(add(dec(A),dec(B)),dec(C)),asDec:true};}
+    return {q:[A,"+",B,"="],ans:add(dec(A),dec(B)),asDec:true};}},
+  {g:"decs",name:"Subtracting decimals",make:function(){
+    var A,B,a;
+    if(LEVEL===1){a=ri(100,999);A=dp(a,1);B=dp(ri(10,a*10-1),2);}
+    else if(LEVEL===2){a=ri(10,99);A=String(a);B=dp(ri(100,a*100-1),2);}
+    else if(LEVEL===3){a=ri(1000,9999);A=dp(a,2);B=dp(ri(100,a*10-1),3);}
+    else{a=ri(10,999);A=String(a);B=dp(ri(1000,a*1000-1),3);}
+    return {q:[A,"−",B,"="],ans:sub(dec(A),dec(B)),asDec:true};}},
+  {g:"decs",name:"Multiplying and dividing by 10, 100, 1000",make:function(){
+    var x=dp(ri(1,L([9999,99999,99999,99999])),L([2,3,3,3]));
+    var p=pick(L([[10,100,1000],[10,100,1000],[100,1000],[1000]]));
+    var op=Math.random()<.5?"×":"÷";var X=dec(x);
+    var res=op==="×"?mul(X,R(p)):div(X,R(p));
+    if(LEVEL>=3&&Math.random()<.5)return {q:["□",op,fmtInt(p),"=",decStr(res)],ans:X,asDec:true};
+    return {q:[x,op,fmtInt(p),"="],ans:res,asDec:true};}},
+  {g:"decs",name:"Decimal times a whole number",make:function(){
+    var x,k;
+    if(LEVEL===1){x=dp(ri(101,999),2);k=ri(3,9);}
+    else if(LEVEL===2){x=dp(ri(1001,9999),2);k=ri(3,9);}
+    else if(LEVEL===3){x=dp(ri(11,999),1);k=ri(12,39);}
+    else{x=dp(ri(101,999),2);k=ri(12,49);}
+    return {q:[x,"×",String(k),"="],ans:mul(dec(x),R(k)),asDec:true};}},
+  {g:"mult",name:"Short multiplication",make:function(){
+    var r=L([[1000,9999],[10000,99999],[10000,99999],[100000,999999]]);var a=ri(r[0],r[1]),b=LEVEL>=3?ri(6,9):ri(3,9);
+    return {q:[fmtInt(a),"×",String(b),"="],ans:R(a*b)};}},
+  {g:"mult",name:"Long multiplication",make:function(){
+    var a,b;
+    if(LEVEL===1){a=Math.random()<.5?ri(120,999):ri(1000,4999);b=ri(12,89);}
+    else if(LEVEL===2){a=ri(1000,4999);b=ri(12,89);}
+    else if(LEVEL===3){a=ri(1000,9999);b=ri(40,99);}
+    else{a=ri(5000,9999);b=ri(60,99);}
+    return {q:[fmtInt(a),"×",String(b),"="],ans:R(a*b)};}},
+  {g:"divi",name:"Short division",make:function(){
+    var d,q,t,r;
+    if(LEVEL<=2){d=ri(3,9);q=LEVEL===1?ri(100,2999):ri(1000,9999);return {q:[fmtInt(d*q),"÷",String(d),"="],ans:R(q)};}
+    q=ri(100,1999);
+    if(LEVEL===3){d=pick([2,4,5,6,8]);t=d===5?pick([2,4,6,8]):5;r=t*d/10;return {q:[fmtInt(d*q+r),"÷",String(d),"="],ans:R(10*q+t,10),asDec:true};}
+    d=pick([4,8]);t=pick([25,50,75]);r=t*d/100;return {q:[fmtInt(d*q+r),"÷",String(d),"="],ans:R(100*q+t,100),asDec:true};}},
+  {g:"divi",name:"Long division",make:function(){
+    var d,q;
+    if(LEVEL===1){d=ri(12,49);q=Math.random()<.6?ri(11,99):ri(101,299);}
+    else if(LEVEL===2){d=ri(12,99);q=ri(101,499);}
+    else if(LEVEL===3){d=ri(21,99);q=ri(101,999);}
+    else{d=ri(51,99);q=ri(201,999);}
+    return {q:[fmtInt(d*q),"÷",String(d),"="],ans:R(q)};}},
   {g:"pct",name:"Percentages of amounts",make:function(){
-    var p=pick([1,5,10,15,20,25,30,35,40,50,60,75,90]),N;
-    if(p===1)N=100*ri(2,40);else if(p===25||p===75)N=4*ri(10,120);else if(p%10===0)N=10*ri(4,90);else N=20*ri(2,45);
+    var p,N;
+    if(LEVEL===1){p=pick([1,5,10,15,20,25,30,35,40,50,60,75,90]);
+      if(p===1)N=100*ri(2,40);else if(p===25||p===75)N=4*ri(10,120);else if(p%10===0)N=10*ri(4,90);else N=20*ri(2,45);}
+    else if(LEVEL===2){p=pick([5,12,15,24,35,45,55,65,85,95]);N=10*ri(4,90);}
+    else if(LEVEL===3){p=ri(2,99);N=10*ri(4,90);}
+    else{p=ri(2,99);N=ri(101,999);}
     return {q:[p+"%","of",fmtInt(N),"="],ans:R(p*N,100),asDec:true};}},
   {g:"frac",name:"Adding fractions",make:function(){
-    var b=pick([2,3,4,5,6]),d=b*pick([2,3]),a=num(b),c=num(d);
-    if(Math.random()<.35){var w=ri(1,3);return {q:[F(a,b,w),"+",F(c,d),"="],ans:add(R(w*b+a,b),R(c,d)),asFrac:true};}
-    if(Math.random()<.4){b=pick([2,3,4,5]);d=pick([3,5,7].filter(function(x){return x!==b;}));a=num(b);c=num(d);}
-    return {q:[F(a,b),"+",F(c,d),"="],ans:add(R(a,b),R(c,d)),asFrac:true};}},
+    var b,d,a,c,w1=0,w2=0;
+    if(LEVEL===1){
+      b=pick([2,3,4,5,6]);d=b*pick([2,3]);a=num(b);c=num(d);
+      if(Math.random()<.35)w1=ri(1,3);
+      else if(Math.random()<.4){b=pick([2,3,4,5]);d=pick([3,5,7].filter(function(x){return x!==b;}));a=num(b);c=num(d);}
+    } else if(LEVEL===2){var pr=distinctPair([2,3,4,5,6,7,8,9]);b=pr[0];d=pr[1];a=num(b);c=num(d);}
+    else if(LEVEL===3){b=pick([2,3,4,5,6]);d=b*pick([2,3]);a=num(b);c=num(d);w1=ri(1,4);w2=ri(1,4);}
+    else{var p2=distinctPair([3,4,5,6,7,8,9]);b=p2[0];d=p2[1];a=num(b);c=num(d);w1=ri(1,5);w2=ri(1,5);}
+    return {q:[F(a,b,w1),"+",F(c,d,w2),"="],ans:add(fr(a,b,w1),fr(c,d,w2)),asFrac:true};}},
   {g:"frac",name:"Subtracting fractions",make:function(){
-    var b=pick([2,3,4,5,6]),d=b*pick([2,3]),a=num(b),c=num(d);
-    var x=R(a,b),y=R(c,d);
-    if(x.n*y.d<=y.n*x.d){return {q:[F(c,d,1),"−",F(a,b),"="],ans:sub(R(d+c,d),R(a,b)),asFrac:true};}
-    return {q:[F(a,b),"−",F(c,d),"="],ans:sub(x,y),asFrac:true};}},
+    var b,d,a,c,w1=0,w2=0,x,y;
+    if(LEVEL===1){b=pick([2,3,4,5,6]);d=b*pick([2,3]);a=num(b);c=num(d);
+      x=R(a,b);y=R(c,d);
+      if(x.n*y.d<=y.n*x.d)return {q:[F(c,d,1),"−",F(a,b),"="],ans:sub(R(d+c,d),R(a,b)),asFrac:true};
+      return {q:[F(a,b),"−",F(c,d),"="],ans:sub(x,y),asFrac:true};}
+    if(LEVEL===2){var pr=distinctPair([2,3,4,5,6,7,8,9]);b=pr[0];d=pr[1];}
+    else if(LEVEL===3){b=pick([2,3,4,5,6]);d=b*pick([2,3]);}
+    else{var p2=distinctPair([3,4,5,6,7,8,9]);b=p2[0];d=p2[1];}
+    a=num(b);c=num(d);
+    if(LEVEL>=3){w1=ri(2,6);w2=ri(1,w1-1);}
+    x=fr(a,b,w1);y=fr(c,d,w2);
+    if(LEVEL===2&&x.n*y.d<=y.n*x.d){var t1=a;a=c;c=t1;t1=b;b=d;d=t1;x=fr(a,b);y=fr(c,d);}
+    return {q:[F(a,b,w1),"−",F(c,d,w2),"="],ans:sub(x,y),asFrac:true};}},
   {g:"frac",name:"Multiplying fractions",make:function(){
-    if(Math.random()<.5){var b=pick([3,4,5,6,8,9,10]),a=num(b),k=ri(2,12);return {q:[F(a,b),"×",String(k),"="],ans:mul(R(a,b),R(k)),asFrac:true};}
-    var b2=pick([2,3,4,5,6,7]),d=pick([2,3,4,5,8,9]),a2=num(b2),c=num(d);
-    return {q:[F(a2,b2),"×",F(c,d),"="],ans:mul(R(a2,b2),R(c,d)),asFrac:true};}},
-  {g:"frac",name:"Dividing fractions by whole numbers",make:function(){var b=pick([2,3,4,5,6,8]),a=num(b),k=ri(2,6);return {q:[F(a,b),"÷",String(k),"="],ans:div(R(a,b),R(k)),asFrac:true};}},
+    var a,b,c,d,k,w;
+    if(LEVEL===1){
+      if(Math.random()<.5){b=pick([3,4,5,6,8,9,10]);a=num(b);k=ri(2,12);return {q:[F(a,b),"×",String(k),"="],ans:mul(R(a,b),R(k)),asFrac:true};}
+      b=pick([2,3,4,5,6,7]);d=pick([2,3,4,5,8,9]);a=num(b);c=num(d);return {q:[F(a,b),"×",F(c,d),"="],ans:mul(R(a,b),R(c,d)),asFrac:true};}
+    if(LEVEL===3&&Math.random()<.5){b=ri(3,12);d=ri(3,12);a=num(b);c=num(d);return {q:[F(a,b),"×",F(c,d),"="],ans:mul(R(a,b),R(c,d)),asFrac:true};}
+    if(LEVEL<=3){w=ri(1,3);b=pick([2,3,4,5,8]);k=ri(LEVEL===3?5:2,9);}else{w=ri(2,5);b=pick([3,4,5,6,8,9]);k=ri(3,12);}
+    a=num(b);return {q:[F(a,b,w),"×",String(k),"="],ans:mul(fr(a,b,w),R(k)),asFrac:true};}},
+  {g:"frac",name:"Dividing fractions by whole numbers",make:function(){
+    var b=pick(L([[2,3,4,5,6,8],[3,4,5,6,7,8,9,10,11,12],[7,9,11,12],[7,9,11,12]])),a=num(b),k=ri(L([2,2,2,6]),L([6,9,9,12]));
+    return {q:[F(a,b),"÷",String(k),"="],ans:div(R(a,b),R(k)),asFrac:true};}},
   {g:"order",name:"Order of operations",make:function(){
-    var t=ri(0,3),a,b,c,e;
-    if(t===0){a=ri(10,99);b=ri(2,12);c=ri(2,12);return {q:[String(a),"+",String(b),"×",String(c),"="],ans:R(a+b*c)};}
-    if(t===1){a=ri(2,30);b=ri(2,30);c=ri(2,9);return {q:["("+a,"+",b+")","×",String(c),"="],ans:R((a+b)*c)};}
-    if(t===2){c=ri(2,9);b=c*ri(2,12);a=ri(b/c+1,150);return {q:[String(a),"−",String(b),"÷",String(c),"="],ans:R(a-b/c)};}
-    a=ri(2,12);b=ri(2,12);c=ri(2,9);e=ri(2,9);
-    if(a*b<c*e){var s=a;a=c;c=s;s=b;b=e;e=s;}
-    return {q:[String(a),"×",String(b),"−",String(c),"×",String(e),"="],ans:R(a*b-c*e)};}},
+    var a,b,c,e,t;
+    if(LEVEL===1){
+      t=ri(0,3);
+      if(t===0){a=ri(10,99);b=ri(2,12);c=ri(2,12);return {q:[String(a),"+",String(b),"×",String(c),"="],ans:R(a+b*c)};}
+      if(t===1){a=ri(2,30);b=ri(2,30);c=ri(2,9);return {q:["("+a,"+",b+")","×",String(c),"="],ans:R((a+b)*c)};}
+      if(t===2){c=ri(2,9);b=c*ri(2,12);a=ri(b/c+1,150);return {q:[String(a),"−",String(b),"÷",String(c),"="],ans:R(a-b/c)};}
+      a=ri(2,12);b=ri(2,12);c=ri(2,9);e=ri(2,9);if(a*b<c*e){var s=a;a=c;c=s;s=b;b=e;e=s;}
+      return {q:[String(a),"×",String(b),"−",String(c),"×",String(e),"="],ans:R(a*b-c*e)};}
+    if(LEVEL===2){
+      t=ri(0,2);
+      if(t===0){a=ri(2,12);b=ri(5,40);c=ri(5,40);e=ri(1,a*(b+c)-1);return {q:[String(a),"×","("+b,"+",c+")","−",String(e),"="],ans:R(a*(b+c)-e)};}
+      if(t===1){c=ri(3,12);var tot=c*ri(4,25);a=ri(1,tot-1);b=tot-a;return {q:["("+a,"+",b+")","÷",String(c),"="],ans:R(tot/c)};}
+      b=ri(3,12);c=ri(3,12);a=ri(b*c+1,b*c+300);return {q:[String(a),"−",String(b),"×",String(c),"="],ans:R(a-b*c)};}
+    if(LEVEL===3){
+      t=ri(0,2);
+      if(t===0){a=ri(20,300);b=ri(3,15);c=ri(3,15);e=ri(1,a+b*c-1);return {q:[String(a),"+",String(b),"×",String(c),"−",String(e),"="],ans:R(a+b*c-e)};}
+      if(t===1){b=ri(5,60);a=b+ri(2,40);c=ri(3,12);e=ri(10,200);return {q:["("+a,"−",b+")","×",String(c),"+",String(e),"="],ans:R((a-b)*c+e)};}
+      b=ri(3,12);a=b*ri(5,30);c=ri(3,12);e=ri(3,12);return {q:[String(a),"÷",String(b),"+",String(c),"×",String(e),"="],ans:R(a/b+c*e)};}
+    t=ri(0,1);
+    if(t===0){a=ri(6,15);b=ri(2,12);c=ri(2,Math.floor((a*a-1)/b));return {q:[a+"²","−",String(b),"×",String(c),"="],ans:R(a*a-b*c)};}
+    a=ri(5,30);b=ri(5,30);e=ri(2,20);c=e+ri(2,15);return {q:["("+a,"+",b+")","×","("+c,"−",e+")","="],ans:R((a+b)*(c-e))};}},
   {g:"order",name:"Squares and cubes",make:function(){
-    var t=ri(0,2);
-    if(t===0){var n=ri(4,15),m=ri(10,200);return {q:[n+"²","+",String(m),"="],ans:R(n*n+m)};}
-    if(t===1){var k=ri(2,6);return {q:[k+"³","="],ans:R(k*k*k)};}
-    var x=ri(2,9),y=ri(2,4);return {q:[x+"²","+",y+"³","="],ans:R(x*x+y*y*y)};}}
+    var n,m,k,t;
+    if(LEVEL===1){t=ri(0,2);
+      if(t===0){n=ri(4,15);m=ri(10,200);return {q:[n+"²","+",String(m),"="],ans:R(n*n+m)};}
+      if(t===1){k=ri(2,6);return {q:[k+"³","="],ans:R(k*k*k)};}
+      n=ri(2,9);m=ri(2,4);return {q:[n+"²","+",m+"³","="],ans:R(n*n+m*m*m)};}
+    if(LEVEL===2){n=ri(5,12);m=ri(2,5);if(Math.random()<.5)return {q:[n+"²","+",m+"³","="],ans:R(n*n+m*m*m)};
+      k=ri(1,n*n-1);return {q:[n+"²","−",String(k),"="],ans:R(n*n-k)};}
+    if(LEVEL===3){if(Math.random()<.5){k=ri(4,10);return {q:[k+"³","="],ans:R(k*k*k)};}
+      n=ri(4,12);m=ri(3,9);return {q:[n+"²","×",String(m),"="],ans:R(n*n*m)};}
+    n=ri(3,12);m=ri(3,12);k=ri(2,5);
+    if(Math.random()<.5)return {q:[n+"²","+",m+"²","+",k+"³","="],ans:R(n*n+m*m+k*k*k)};
+    n=ri(6,15);k=ri(2,5);if(n*n<=k*k*k)n=15;return {q:[n+"²","−",k+"³","="],ans:R(n*n-k*k*k)};}}
 ];
 function correctText(it){if(it.asFrac)return fracStr(it.ans);if(it.asDec)return decStr(it.ans);return fmtInt(it.ans.n);}
 
@@ -276,6 +382,8 @@ function say(parts){
 /* ---------- state ---------- */
 var S={view:"home"};
 var chosen=load("satsp-groups-v1",Object.keys(GROUPS));
+var unlocked=load("satsp-unlocked-v1",1);
+var curLevel=Math.min(load("satsp-level-v1",1),unlocked);
 
 function logSession(entry){var l=load(KEY_LOG,[]);l.unshift(entry);store(KEY_LOG,l.slice(0,60));}
 
@@ -300,13 +408,18 @@ function home(){
 function arithSetup(){
   S={view:"arith-setup"};
   var chips=Object.keys(GROUPS).map(function(g){return '<button class="chip" data-act="chip" data-g="'+g+'" aria-pressed="'+(chosen.indexOf(g)>=0)+'">'+esc(GROUPS[g])+'</button>';}).join("");
+  var lv=[1,2,3,4].map(function(n){var open=n<=unlocked;return '<button class="chip lvl" data-act="level" data-l="'+n+'" aria-pressed="'+(n===curLevel)+'"'+(open?"":" disabled")+'>Level '+n+(open?"":" 🔒")+'</button>';}).join("");
   app.innerHTML='<button class="back" data-act="home">‹ Back</button>'+
-    '<div class="panel"><h2>Arithmetic</h2><p class="muted" style="margin-top:6px">Choose what to practise.</p>'+
+    '<div class="panel"><h2>Arithmetic</h2>'+
+    '<p class="muted" style="margin-top:6px">Pick a level.</p><div class="chips">'+lv+'</div>'+
+    '<p class="small">Level '+curLevel+' target: '+PACE[curLevel-1]+' seconds a question.'+(unlocked<4?' Score 8 out of 10 or better on Level '+unlocked+' to unlock the next one.':' All levels unlocked.')+'</p>'+
+    '<p class="muted" style="margin-top:14px">Choose what to practise.</p>'+
     '<div class="chips">'+chips+'</div>'+
     '<div class="row"><button class="btn" data-act="arith-go" data-n="10">10 questions</button><button class="btn alt" data-act="arith-go" data-n="20">20 questions</button></div>'+
     '<p class="muted small" style="margin-top:14px">For fractions, type a slash, like 3/4. For a mixed number, use the space key: 1 3/4.</p></div>';
 }
 function arithStart(n,onlyNames){
+  LEVEL=curLevel;
   var gens=GENS.filter(function(g){return onlyNames?onlyNames.indexOf(g.name)>=0:chosen.indexOf(g.g)>=0;});
   if(!gens.length)gens=GENS;
   var items=[];
@@ -365,11 +478,14 @@ function arithDone(){
   var counts={};S.missed.forEach(function(t){counts[t]=(counts[t]||0)+1;});
   var missedTypes=Object.keys(counts);
   var when=nowStr();
-  logSession({kind:"Arithmetic",when:when,score:S.right,total:n,secs:secs,missed:missedTypes});
+  logSession({kind:"Arithmetic, Level "+LEVEL,when:when,score:S.right,total:n,secs:secs,missed:missedTypes});
   S.view="arith-done";S.redo=missedTypes;
-  app.innerHTML='<div class="summary"><p class="muted">Arithmetic, '+esc(when)+'</p>'+
+  var target=PACE[LEVEL-1],newly=false;
+  if(n>=10&&S.right/n>=0.8&&LEVEL===unlocked&&unlocked<4){unlocked++;store("satsp-unlocked-v1",unlocked);newly=true;}
+  app.innerHTML='<div class="summary"><p class="muted">Arithmetic, Level '+LEVEL+', '+esc(when)+'</p>'+
+    (newly?'<p class="feedback ok">Level '+unlocked+' unlocked.</p>':'')+
     '<p class="big" style="margin-top:8px">'+S.right+'<span> / '+n+'</span></p>'+
-    '<dl><dt>Time</dt><dd>'+Math.floor(secs/60)+' min '+(secs%60)+' s</dd><dt>Per question</dt><dd>'+per+' s (the real paper allows about 50 s)</dd>'+
+    '<dl><dt>Time</dt><dd>'+Math.floor(secs/60)+' min '+(secs%60)+' s</dd><dt>Per question</dt><dd>'+per+' s, target '+target+' s'+(per<=target?', on pace':', a bit slow')+'</dd>'+
     '<dt>To work on</dt><dd>'+(missedTypes.length?missedTypes.map(function(t){return esc(t)+(counts[t]>1?" ("+counts[t]+")":"");}).join(", "):"Nothing missed")+'</dd></dl>'+
     '<p class="muted small">Take a screenshot and send it to Dad.</p></div>'+
     '<div class="row" style="margin-top:16px">'+(missedTypes.length?'<button class="btn sun" data-act="arith-redo">Practise the ones I missed</button>':'')+
@@ -475,6 +591,7 @@ app.addEventListener("click",function(e){
     store("satsp-groups-v1",chosen);
     el.setAttribute("aria-pressed",String(chosen.indexOf(g)>=0));
   }
+  else if(a==="level"){curLevel=+el.dataset.l;store("satsp-level-v1",curLevel);arithSetup();}
   else if(a==="arith-go")arithStart(+el.dataset.n);
   else if(a==="arith-redo")arithStart(Math.max(10,S.redo.length*3),S.redo);
   else if(a==="spell-setup")spellSetup();
