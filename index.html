@@ -94,6 +94,46 @@ button,input,select{font:inherit;color:inherit}
 .keypad button.go{background:var(--teal);color:#fff;border-color:var(--teal);font-size:1.15rem;font-family:"Lexend",system-ui,sans-serif}
 .keypad button:active{transform:translateY(1px)}
 .hint{margin-top:10px}
+.keypad button.full{grid-column:1/-1}
+.rtext{font-size:1.25rem;line-height:1.55;text-align:left;margin:0}
+.unit{margin-top:8px}
+.tile.course{background:var(--teal);color:#fff;grid-column:1/-1;min-height:140px}
+.tile.course .sym{opacity:1}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.daycell{appearance:none;text-align:left;border:2px solid var(--rule);background:var(--card);border-radius:14px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:4px;min-height:84px;font-size:.92rem}
+.daycell.done{border-color:var(--right);background:var(--right-soft)}
+.daycell.now{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+.daycell:disabled{opacity:.45;cursor:not-allowed}
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--rule);border-radius:18px;padding:16px}
+.step .sbody{flex:1;min-width:0}
+.step .snum{flex:0 0 44px;height:44px;border-radius:50%;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;font-family:"Fredoka",system-ui,sans-serif;font-weight:700;font-size:1.3rem}
+.step.sdone .snum{background:var(--right);color:#fff}
+.qline{font-size:1.15rem;font-weight:500}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.opt{appearance:none;text-align:left;border:2px solid var(--rule);background:var(--key);border-radius:14px;padding:12px 14px;min-height:52px;cursor:pointer;font-size:1.02rem}
+.opt.right{border-color:var(--right);background:var(--right-soft)}
+.opt.wrong{border-color:var(--wrong);background:var(--wrong-soft)}
+.opt:disabled{cursor:default;color:var(--ink)}
+.ctx{background:var(--sun-soft);border-radius:16px;padding:16px;margin-bottom:12px}
+.ctx h3{margin-bottom:8px}
+.ctx p{margin-top:6px;font-size:.98rem}
+.ords{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.ordcard{appearance:none;text-align:left;display:flex;gap:12px;align-items:flex-start;border:2px solid var(--rule);background:var(--key);border-radius:14px;padding:12px;cursor:pointer;font-size:1rem;color:var(--ink)}
+.ordcard .badge{flex:0 0 32px;height:32px;border-radius:50%;border:2px solid var(--rule);display:flex;align-items:center;justify-content:center;font-family:"Fredoka",system-ui,sans-serif;font-weight:700}
+.ordcard.picked{border-color:var(--teal)}
+.ordcard.picked .badge{background:var(--teal);border-color:var(--teal);color:#fff}
+.ordcard.right{border-color:var(--right);background:var(--right-soft)}
+.ordcard.wrong{border-color:var(--wrong);background:var(--wrong-soft)}
+.ordcard:disabled{cursor:default}
+.rightorder{margin:10px 0 0;padding-left:22px}
+.rightorder li{margin-top:6px}
+.planbox{display:flex;flex-direction:column;gap:4px;margin-top:10px;font-weight:500;font-size:.95rem}
+.planbox textarea{min-height:56px}
+.tick{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--rule);cursor:pointer}
+.tick input{width:26px;height:26px;flex:0 0 26px;margin:0;accent-color:var(--teal)}
+.timer{font-family:"Fredoka",system-ui,sans-serif;font-size:1.4rem;font-weight:600}
+@media (max-width:560px){.step{flex-wrap:wrap}.step .btn{width:100%}}
 
 /* spelling */
 .speak{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
@@ -152,7 +192,7 @@ function fmtInt(n){return n.toLocaleString("en-GB");}
 function decStr(r){var v=r.n/r.d;var s=v.toFixed(6).replace(/0+$/,"").replace(/\.$/,"");var parts=s.split(".");return fmtInt(parseInt(parts[0],10))+(parts[1]?"."+parts[1]:"");}
 function fracStr(r){if(r.d===1)return fmtInt(r.n);var w=Math.floor(r.n/r.d),rem=r.n-w*r.d;return (w?w+" ":"")+rem+"/"+r.d;}
 function parseAns(s){
-  s=String(s).trim().replace(/,/g,"").replace(/\s+/g," ");
+  s=String(s).trim().replace(/[−–]/g,"-").replace(/,/g,"").replace(/\s+/g," ");
   var m;
   if(/^-?\d+(\.\d+)?$/.test(s))return dec(s);
   if(/^-?\.\d+$/.test(s))return dec(s.replace(".","0."));
@@ -332,7 +372,7 @@ var GENS=[
     if(Math.random()<.5)return {q:[n+"²","+",m+"²","+",k+"³","="],ans:R(n*n+m*m+k*k*k)};
     n=ri(6,15);k=ri(2,5);if(n*n<=k*k*k)n=15;return {q:[n+"²","−",k+"³","="],ans:R(n*n-k*k*k)};}}
 ];
-function correctText(it){if(it.asFrac)return fracStr(it.ans);if(it.asDec)return decStr(it.ans);return fmtInt(it.ans.n);}
+function correctText(it){if(it.money)return (it.ans.n/it.ans.d).toFixed(2);if(it.asFrac)return fracStr(it.ans);if(it.asDec)return decStr(it.ans);return fmtInt(it.ans.n);}
 
 /* ---------- spelling: statutory Year 5 and 6 word list ---------- */
 var WORDS=[
@@ -391,8 +431,8 @@ function logSession(entry){var l=load(KEY_LOG,[]);l.unshift(entry);store(KEY_LOG
 function home(){
   S={view:"home"};
   var l=load(KEY_LOG,[]).slice(0,6);
-  var html='<div class="hello"><h1>SATs practice</h1><p class="muted">Ten minutes a day. Pick one.</p></div>'+
-    '<div class="tiles">'+
+  var html='<div class="hello"><h1>SATs practice</h1><p class="muted">Do today’s course day, or practise on your own.</p></div>'+
+    '<div class="tiles">'+courseTile()+
     '<button class="tile maths" data-act="arith-setup"><span class="sym">× ÷</span><span class="big">Arithmetic</span><span>Quick-fire sums, like paper 1.</span></button>'+
     '<button class="tile spell" data-act="spell-setup"><span class="sym">Aa</span><span class="big">Spelling</span><span>Hear a word, type it.</span></button>'+
     '</div>';
@@ -431,17 +471,20 @@ function arithStart(n,onlyNames){
 function arithDraw(){
   var it=S.items[S.i];
   var pct=100*S.i/S.items.length;
-  app.innerHTML='<div class="qtop"><button class="back" data-act="home">‹ Stop</button><span class="muted">'+(S.i+1)+' of '+S.items.length+'</span></div>'+
+  var stop=S.course?'<button class="back" data-act="day" data-n="'+S.course+'">‹ Day '+S.course+'</button>':'<button class="back" data-act="home">‹ Stop</button>';
+  var qh=it.text?'<p class="rtext">'+esc(it.text)+'</p>':'<div class="qtext" aria-label="'+esc(it.q.map(tokText).join(" "))+'">'+it.q.map(tokHTML).join("")+'</div>';
+  app.innerHTML='<div class="qtop">'+stop+'<span class="muted">'+(S.i+1)+' of '+S.items.length+'</span></div>'+
     '<div class="progress"><div style="width:'+pct+'%"></div></div>'+
-    '<div class="qcard"><div class="qtext" aria-label="'+esc(it.q.map(tokText).join(" "))+'">'+it.q.map(tokHTML).join("")+'</div>'+
-    '<div class="answer" id="ans" aria-live="polite"></div><div class="feedback" id="fb" aria-live="polite"></div></div>'+
+    '<div class="qcard">'+qh+
+    '<div class="answer" id="ans" aria-live="polite"></div>'+(it.unit?'<p class="muted small unit">Answer in '+esc(it.unit)+'</p>':'')+'<div class="feedback" id="fb" aria-live="polite"></div></div>'+
     '<div class="keypad" id="pad">'+
-    ["7","8","9","⌫","4","5","6","/","1","2","3","space","0","."].map(function(k){
+    ["7","8","9","⌫","4","5","6","/","1","2","3","space","0",".","-"].map(function(k){
+      if(k==="-")return '<button data-key="-" aria-label="Minus sign">−</button>';
       if(k==="space")return '<button data-key=" " aria-label="Space for mixed numbers">␣</button>';
       if(k==="⌫")return '<button data-key="back" aria-label="Delete">⌫</button>';
       return '<button data-key="'+k+'">'+k+'</button>';
     }).join("")+
-    '<button class="wide go" data-key="enter" id="go">Check</button></div>';
+    '<button class="wide go full" data-key="enter" id="go">Check</button></div>';
   arithShow();
 }
 function arithShow(){
@@ -454,6 +497,7 @@ function arithKey(k){
   if(S.checked){if(k==="enter")arithNext();return;}
   if(k==="back"){S.input=S.input.slice(0,-1);}
   else if(k==="enter"){arithCheck();return;}
+  else if(k==="-"){if(!S.input)S.input="-";}
   else if(S.input.length<14){S.input+=k;}
   arithShow();
 }
@@ -466,12 +510,12 @@ function arithCheck(){
   arithShow();
   var fb=document.getElementById("fb");
   if(ok){fb.textContent=pick(["Correct.","Yes, that's it.","Spot on.","Right."]);fb.className="feedback ok";}
-  else{fb.textContent=(v?"Not quite. ":"That isn't a number I can read. ")+"The answer is "+correctText(it)+".";fb.className="feedback no";}
+  else{fb.textContent=(v?"Not quite. ":"That isn't a number I can read. ")+"The answer is "+correctText(it).replace(/^-/,"−")+(it.unit&&it.text?" ("+it.unit.split(" (")[0]+")":"")+".";fb.className="feedback no";}
   var go=document.getElementById("go");go.textContent=S.i+1<S.items.length?"Next":"See results";
 }
 function arithNext(){
   S.i++;S.input="";S.checked=false;
-  if(S.i>=S.items.length)arithDone();else arithDraw();
+  if(S.i>=S.items.length){if(S.course)courseMathsDone();else arithDone();}else arithDraw();
 }
 function arithDone(){
   var secs=Math.round((Date.now()-S.start)/1000),n=S.items.length,per=Math.round(secs/n);
@@ -577,13 +621,543 @@ function spellDone(){
     '<div class="row" style="margin-top:16px"><button class="btn" data-act="spell-go">Another 10</button><button class="btn alt" data-act="home">Done</button></div>';
 }
 
+/* ---------- reasoning problems (answers computed in code) ---------- */
+var NAMES=["Mia","Sam","Aisha","Leo","Priya","Tom","Zara","Ollie","Ruby","Kai"];
+function money(p){return p<100?p+"p":"£"+(p/100).toFixed(2);}
+function hhmm(m){m=((m%1440)+1440)%1440;return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");}
+function neg(x){return x<0?"−"+(-x):String(x);}
+function isPrime(n){if(n<2)return false;for(var i=2;i*i<=n;i++)if(n%i===0)return false;return true;}
+function meanSet(n,lo,hi){
+  for(var tries=0;tries<200;tries++){
+    var m=ri(lo+3,hi-3),v=[],s=0;
+    for(var i=0;i<n-1;i++){var x=ri(lo,hi);v.push(x);s+=x;}
+    var last=n*m-s;
+    if(last>=lo&&last<=hi){v.push(last);return {v:shuffle(v),m:m};}
+  }
+  return {v:[lo,lo+2,lo+4,lo+6,lo+8].slice(0,n),m:lo+4};
+}
+var RGENS=[
+  {name:"Money problems",make:function(t){
+    var nm=pick(NAMES),a,b,qa=ri(2,4),qb=ri(2,5),c=0,qc=0;
+    if(t<3){a=5*ri(21,79);b=5*ri(8,19);}else{a=10*ri(11,39);b=10*ri(4,9);}
+    var total=qa*a+qb*b;
+    var txt="A notebook costs "+money(a)+" and a pen costs "+money(b)+". ";
+    if(t>=2){c=t===3?10*ri(15,49):5*ri(30,99);qc=ri(1,3);total+=qc*c;txt+="A folder costs "+money(c)+". ";}
+    txt+=nm+" buys "+qa+" notebooks"+(qc?", "+qb+" pens and "+qc+" folder"+(qc>1?"s":""):" and "+qb+" pens")+". ";
+    if(t===3){total=total*9/10;txt+="The shop takes 10% off the total. ";}
+    var note=[500,1000,2000,5000].filter(function(x){return x>total;})[0];
+    txt+="How much change does "+nm+" get from a £"+(note/100)+" note?";
+    return {text:txt,ans:R(note-total,100),asDec:true,money:true,unit:"pounds (for example 3.45)"};}},
+  {name:"Measures",make:function(t){
+    var nm=pick(NAMES);
+    if(t===1){var L=pick([1.5,2,2.5,3]),ml=L*1000,g=pick([150,200,250,300]),n=ri(2,Math.floor(ml/g)-1);
+      return {text:"A jug holds "+L+" litres of water. "+nm+" pours out "+n+" glasses of "+g+" ml. How many millilitres are left in the jug?",ans:R(ml-n*g),unit:"ml"};}
+    if(t===2){var kg=pick([1.5,2,2.5,3]),gr=kg*1000,per=pick([225,275,325,350,375]),k=ri(2,Math.floor(gr/per)-1);
+      return {text:"A bag of flour weighs "+kg+" kg. Each cake uses "+per+" g. How many grams of flour are left after "+nm+" bakes "+k+" cakes?",ans:R(gr-k*per),unit:"g"};}
+    var lap=pick([200,250,400,500]),opts=[2,3,4,5,6,8,10].filter(function(x){return (x*1000)%lap===0&&x*1000/lap>=8;}),km=pick(opts),tot=km*1000/lap,done=ri(2,tot-2);
+    return {text:"A running track is "+lap+" m long. "+nm+" wants to run "+km+" km and has already run "+done+" laps. How many more laps does "+nm+" need to run?",ans:R(tot-done),unit:"laps"};}},
+  {name:"Time",make:function(t){
+    var nm=pick(NAMES);
+    if(t===1){var s=ri(480,900),d=ri(35,95);
+      return {text:"A train leaves at "+hhmm(s)+" and arrives at "+hhmm(s+d)+". How many minutes does the journey take?",ans:R(d),unit:"minutes"};}
+    if(t===2){var a=ri(25,55),w=pick([5,6,7,9,10,12,14,15,16,20]),b=ri(65,110),st=ri(420,540);
+      return {text:nm+" leaves home at "+hhmm(st)+". The bus takes "+a+" minutes, then there is a "+w+"-minute wait, then the train takes 1 hour "+(b-60)+" minutes. How many minutes after leaving home does "+nm+" arrive?",ans:R(a+w+b),unit:"minutes"};}
+    var k=pick([12,15,20,25]),first=ri(360,420),j=ri(30,55),n=ri(4,7);
+    return {text:"Buses leave the station every "+k+" minutes, starting at "+hhmm(first)+". Each journey takes "+j+" minutes. How many minutes after the first bus leaves does bus number "+n+" reach the end of its journey?",ans:R((n-1)*k+j),unit:"minutes"};}},
+  {name:"Ratio and proportion",make:function(t){
+    if(t===1){var b=pick([2,4,5]),per=5*ri(4,18),n=pick([3,6,8,10,12].filter(function(x){return x!==b;}));
+      return {text:"A recipe for "+b+" people uses "+(per*b)+" g of flour. How many grams of flour are needed for "+n+" people?",ans:R(per*n),unit:"g"};}
+    if(t===2){var r1=ri(1,4),r2=ri(2,5);if(r1===r2)r2++;var u=ri(4,15),tot=(r1+r2)*u;
+      return {text:"In a bag, the ratio of red beads to blue beads is "+r1+" : "+r2+". There are "+tot+" beads altogether. How many blue beads are there?",ans:R(r2*u),unit:"beads"};}
+    var a=ri(2,5),c=a+ri(1,4),v=ri(3,12);
+    return {text:"The ratio of boys to girls in a club is "+a+" : "+c+". There are "+((c-a)*v)+" more girls than boys. How many children are in the club altogether?",ans:R((a+c)*v),unit:"children"};}},
+  {name:"Fractions of amounts",make:function(t){
+    var b=pick([3,4,5,6,8]),a=num(b);
+    if(t===1){var N=b*ri(12,90);return {text:"There are "+N+" children in a school. "+a+"/"+b+" of them walk to school. How many children walk to school?",ans:R(N*a/b),unit:"children"};}
+    if(t===2){var M=b*ri(12,90);return {text:"A farmer has "+M+" sheep. "+a+"/"+b+" of them are in the top field. How many sheep are not in the top field?",ans:R(M-M*a/b),unit:"sheep"};}
+    var p=pick([[2,5,1,4],[1,3,1,4],[3,10,1,5],[1,6,1,3],[2,7,1,4]]),L=p[1]*p[3]/gcd(p[1],p[3]),K=L*ri(4,20),w=K*p[0]/p[1],cc=K*p[2]/p[3];
+    return {text:"There are "+K+" pupils in a school. "+p[0]+"/"+p[1]+" of them walk to school and "+p[2]+"/"+p[3]+" come by car. The rest cycle. How many pupils cycle?",ans:R(K-w-cc),unit:"pupils"};}},
+  {name:"Percentages in context",make:function(t){
+    if(t===1){var p=pick([10,20,25,50]),pr=pick([20,40,60,80,120,160]);
+      return {text:"A coat costs £"+pr+". In a sale, the price is reduced by "+p+"%. What is the sale price?",ans:R(pr*(100-p),100),asDec:true,money:true,unit:"pounds"};}
+    if(t===2){var q=pick([5,15,35,45]),pr2=10*ri(3,15);
+      return {text:"A bike helmet costs £"+pr2+". The price goes down by "+q+"%. What is the new price?",ans:R(pr2*(100-q),100),asDec:true,money:true,unit:"pounds"};}
+    var A,B,diff;
+    do{A=4*ri(10,20);B=10*ri(3,8);diff=Math.abs(15*A-18*B);}while(diff===0);
+    return {text:"Shop A sells a game for £"+A+" with 25% off. Shop B sells the same game for £"+B+" with 10% off. How much cheaper is the cheaper shop?",ans:R(diff,20),asDec:true,money:true,unit:"pounds"};}},
+  {name:"Angles",make:function(t){
+    if(t===1){var a=ri(25,155);return {text:"Two angles sit on a straight line. One of them is "+a+"°. What is the other angle?",ans:R(180-a),unit:"degrees"};}
+    if(t===2){
+      if(Math.random()<.5){var x=ri(25,90),y=ri(25,150-x);return {text:"A triangle has angles of "+x+"° and "+y+"°. What is the third angle?",ans:R(180-x-y),unit:"degrees"};}
+      var top=2*ri(10,70);return {text:"An isosceles triangle has an angle of "+top+"° between its two equal sides. What is the size of each of the other two angles?",ans:R((180-top)/2),unit:"degrees"};}
+    var a1=ri(40,110),a2=ri(40,110),a3=ri(40,Math.min(110,320-a1-a2));
+    return {text:"Four angles meet at a point. Three of them are "+a1+"°, "+a2+"° and "+a3+"°. What is the fourth angle?",ans:R(360-a1-a2-a3),unit:"degrees"};}},
+  {name:"Area and perimeter",make:function(t){
+    if(t===1){var l=ri(6,19),w=ri(3,l-1);return {text:"A rectangle is "+l+" cm long and "+w+" cm wide. What is its area?",ans:R(l*w),unit:"cm²"};}
+    if(t===2){var L=ri(8,20),W=ri(3,L-1);return {text:"A rectangle is "+L+" cm long. Its perimeter is "+(2*(L+W))+" cm. What is its area?",ans:R(L*W),unit:"cm²"};}
+    var BL=ri(10,16),BW=ri(8,12),cl=ri(2,BL-4),cw=ri(2,BW-4);
+    return {text:"An L-shape is made by cutting a "+cl+" cm by "+cw+" cm rectangle from one corner of a "+BL+" cm by "+BW+" cm rectangle. What is the area of the L-shape?",ans:R(BL*BW-cl*cw),unit:"cm²"};}},
+  {name:"Algebra",make:function(t){
+    if(t===1){var k=ri(3,9),n=ri(6,25);return {text:k+"n = "+(k*n)+". What is n?",ans:R(n)};}
+    if(t===2){
+      if(Math.random()<.5){var m=ri(2,6),x=ri(5,30),c=ri(3,Math.min(20,m*x-1));return {text:m+"a − "+c+" = "+(m*x-c)+". What is a?",ans:R(x)};}
+      var y=ri(4,20),p=ri(3,6),q=ri(5,25);return {text:"I think of a number, multiply it by "+p+" and add "+q+". The answer is "+(y*p+q)+". What was my number?",ans:R(y)};}
+    if(Math.random()<.5){var s=ri(3,15),d=ri(3,9),k2=ri(15,30);
+      return {text:"A sequence starts "+s+", "+(s+d)+", "+(s+2*d)+", "+(s+3*d)+" and keeps going up by the same amount each time. What is term number "+k2+"?",ans:R(s+(k2-1)*d)};}
+    var X=ri(10,30),Y=ri(2,X-2);return {text:"x + y = "+(X+Y)+" and x − y = "+(X-Y)+". What is x?",ans:R(X)};}},
+  {name:"Averages",make:function(t){
+    var nm=pick(NAMES),ms;
+    if(t===1){ms=meanSet(4,5,25);return {text:"In four games, "+nm+" scored "+ms.v.slice(0,3).join(", ")+" and "+ms.v[3]+" points. What was the mean score?",ans:R(ms.m),unit:"points"};}
+    if(t===2){ms=meanSet(5,120,160);return {text:"Five children measured their heights: "+ms.v.slice(0,4).join(" cm, ")+" cm and "+ms.v[4]+" cm. What is their mean height?",ans:R(ms.m),unit:"cm"};}
+    ms=meanSet(5,20,80);var hid=ms.v[4];
+    return {text:"The mean of five numbers is "+ms.m+". Four of the numbers are "+ms.v.slice(0,3).join(", ")+" and "+ms.v[3]+". What is the fifth number?",ans:R(hid)};}},
+  {name:"Volume",make:function(t){
+    if(t===1){var a=ri(3,12),b=ri(3,10),c=ri(2,9);return {text:"A cuboid measures "+a+" cm by "+b+" cm by "+c+" cm. What is its volume?",ans:R(a*b*c),unit:"cm³"};}
+    if(t===2){var x=ri(4,12),y=ri(3,10),z=ri(2,9);return {text:"A box has a volume of "+(x*y*z)+" cm³. It is "+x+" cm long and "+y+" cm wide. How tall is it?",ans:R(z),unit:"cm"};}
+    var L=10*ri(4,8),W=10*ri(3,6),H=10*ri(2,5);
+    return {text:"A fish tank is "+L+" cm long, "+W+" cm wide and "+H+" cm tall. It is filled to the top with water. How many litres does it hold? (1 litre = 1,000 cm³)",ans:R(L*W*H,1000),asDec:true,unit:"litres"};}},
+  {name:"Number facts",make:function(t){
+    if(t===1){var n=ri(1000000,9999999),p=pick([1000,10000,100000]);return {text:"Round "+fmtInt(n)+" to the nearest "+fmtInt(p)+".",ans:R(Math.round(n/p)*p)};}
+    if(t===2){
+      var lo,hi,ps;
+      do{lo=ri(10,60);hi=lo+ri(10,15);ps=[];for(var k=lo+1;k<hi;k++)if(isPrime(k))ps.push(k);}while(isPrime(lo)||isPrime(hi)||ps.length<2);
+      return {text:"What is the total of all the prime numbers between "+lo+" and "+hi+"?",ans:R(ps.reduce(function(s,v){return s+v;},0))};}
+    var a=pick([4,6,8,9,12]),b=pick([6,10,15,8,9].filter(function(x){return x!==a;})),l=a*b/gcd(a,b),X=ri(30,200);
+    return {text:"What is the smallest number greater than "+X+" that is a multiple of both "+a+" and "+b+"?",ans:R(Math.ceil((X+1)/l)*l)};}},
+  {name:"Negative numbers",make:function(t){
+    if(t===1){var a=-ri(2,12),b=ri(2,15);return {text:"At 6 am the temperature was "+neg(a)+"°C. By 2 pm it was "+b+"°C. By how many degrees did it rise?",ans:R(b-a),unit:"degrees"};}
+    if(t===2){var s=ri(2,9),f=ri(s+3,s+15);return {text:"The temperature was "+s+"°C. During the night it fell by "+f+" degrees. What was the temperature then?",ans:R(s-f),unit:"°C (use the − key for a negative number)"};}
+    var s2=-ri(3,10),r=ri(4,12),f2=ri(8,20);
+    return {text:"At midnight it was "+neg(s2)+"°C. By noon it had risen by "+r+" degrees. By the next midnight it had fallen by "+f2+" degrees. What was the temperature then?",ans:R(s2+r-f2),unit:"°C (use the − key for a negative number)"};}}
+];
+
+/* ---------- 30-day course content ---------- */
+/* In every multiple-choice question, the FIRST option is the correct one. Options are shuffled on screen. */
+var TEXTS={
+  coast:{title:"Our trip to the coast",p:[
+    "Last Saturday, my family and I set off early for a day at the coast. The car was packed with towels, a picnic and far too many buckets.",
+    "When we arrived, the beach was almost empty. We chose a spot near the rock pools, and my little brother started digging straight away.",
+    "After lunch, the tide came in quickly. We had to move everything twice, and one bucket floated away before anyone could grab it.",
+    "By the time we drove home, everyone was sandy and tired. It was one of the best days of the summer, even without the bucket."]},
+  diary:{title:"The school play",p:[
+    "Dear Diary, today was the day of the school play, and I was so nervous I couldn’t eat my breakfast.",
+    "At lunchtime, Mr Okafor gathered us backstage for one last rehearsal. I forgot my lines twice, which made me feel even worse.",
+    "When the curtain finally opened at six o’clock, I looked out and saw Mum in the front row. Somehow, every word came back to me.",
+    "Now I’m in bed, and I can still hear the clapping. I can’t wait to do it again next year!"]},
+  sunflower:{title:"How to plant a sunflower seed",p:[
+    "Sunflowers are easy to grow, and with a little care they can grow taller than you. Here is what you need to do.",
+    "First, fill a small pot with compost and press it down gently.",
+    "Next, push the seed about two centimetres into the compost and cover it over.",
+    "Then water the pot and place it on a sunny windowsill.",
+    "Finally, once the seedling is about ten centimetres tall, plant it outside against a sunny wall or fence."]},
+  library:{title:"Library cat becomes local celebrity",p:[
+    "A cat that wandered into Millbrook Library three years ago has become one of the town’s most popular visitors, staff said yesterday.",
+    "Pickles, a ginger tom, first appeared during a storm. Librarians gave him a blanket, and he has returned almost every day since.",
+    "Visitors now come from nearby villages to see him. “Children read to him, and he sits there listening,” said librarian Joan Hale.",
+    "The library is now planning a “Read to Pickles” club, which will start next month."]},
+  letter:{title:"A letter to the headteacher",p:[
+    "Dear Mrs Patel, I am writing to ask you to let Year 6 plant a vegetable garden on the empty grass behind the hall.",
+    "Firstly, a garden would help us learn. We could measure plants in maths and study life cycles in science.",
+    "Furthermore, growing food would make the school healthier, because the vegetables could be used in the kitchen.",
+    "Some people may worry that a garden would be too much work. However, our class has already agreed to take turns looking after it.",
+    "I hope you will agree that a garden would benefit everyone. Please could we discuss it at the next school council meeting? Yours sincerely, Year 6"]},
+  door:{title:"The blue door",p:[
+    "Nobody in the Ellis family had ever opened the small blue door at the top of the stairs. Grandad said the key had been lost long before any of them were born.",
+    "One rainy afternoon, Tilly found an old iron key at the bottom of a box of buttons. It was heavy, rusty and exactly the right size.",
+    "Her hands shook as she turned it in the lock. With a loud click, the door swung open, and a cold wind rushed out of the darkness.",
+    "Inside, there was only a dusty room full of paintings. Every single one showed the same girl, and every single one looked exactly like Tilly.",
+    "That night, Tilly put the key under her pillow. She knew she would be going back."]},
+  phones:{title:"Should primary school children have mobile phones?",p:[
+    "Many parents and teachers disagree about whether children in primary school should be allowed mobile phones. There are arguments on both sides.",
+    "On the one hand, a phone can help children stay safe. Parents can contact them on the way to and from school.",
+    "On the other hand, phones can be a distraction in lessons, and some children may feel left out if they do not have one.",
+    "Overall, I believe phones should be allowed, but only if they are switched off and kept in bags during the school day."]},
+  rainbow:{title:"How a rainbow forms",p:[
+    "Rainbows appear when sunlight and rain happen at the same time. But how do they form?",
+    "Sunlight looks white, but it is a mixture of many colours.",
+    "When the light enters a raindrop, it bends and splits into these separate colours.",
+    "The light then reflects off the back of the raindrop and comes back out towards us, which is why we see a band of colours across the sky.",
+    "This is why, to see a rainbow, you need to stand with the sun behind you."]},
+  river:{title:"The year the river froze",p:[
+    "Every winter, the old people of Brindle talked about the year the river froze, but nobody under sixty had ever seen it happen.",
+    "So when Ana looked out of her window one January morning and saw the river white and still, she ran to fetch her grandmother.",
+    "Together, they walked down to the bank. Children were already sliding across the ice, and someone had set up a stall selling hot chestnuts.",
+    "By the afternoon, however, the sun had come out, and long cracks began to spread across the surface. Everyone hurried back to the bank.",
+    "That evening, Ana’s grandmother told her that she was now one of the lucky few. One day, Ana would be the one telling the story."]},
+  hedgehogs:{title:"Hedgehogs",p:[
+    "Hedgehogs are small, spiny mammals found in gardens, parks and woodland across the UK.",
+    "A hedgehog’s back is covered in thousands of sharp spines. When it is frightened, it rolls into a tight ball so that only the spines can be seen.",
+    "Hedgehogs eat beetles, worms, caterpillars and slugs, which is why gardeners are often pleased to see them.",
+    "They are nocturnal, which means they sleep during the day and search for food at night. In winter, they hibernate.",
+    "Sadly, hedgehog numbers in the UK have fallen in recent years. Leaving small gaps in garden fences helps them move around safely."]}
+};
+function MC(q,o,why,ctx){return {k:"mc",q:q,o:o,why:why||"",ctx:ctx};}
+function ORD(id){return {k:"order",id:id};}
+var COURSE=[
+/* 1 */{t:"Paragraphs have jobs",
+ learn:"Good writing is built from paragraphs, and each one has a job. The opening tells the reader what the piece is about. The middle paragraphs build it up. The ending wraps it up. Start a new paragraph when the time, place, topic or person changes.",
+ tasks:[MC("When should you start a new paragraph?",["When the time, place, topic or person changes","After every three sentences","When you reach the end of a line","Only at the end of a story"],"A new paragraph tells the reader that something has changed."),
+  MC("What is the main job of an opening paragraph?",["To tell the reader what the piece is about and make them want to read on","To include every detail at once","To say goodbye to the reader","To list every character’s name"],"The opening sets things up so the reader knows what is coming."),
+  ORD("coast")],
+ write:{p:"Write a recount of a day out, real or made up, in four short paragraphs. Two or three sentences in each paragraph is plenty.",plan:["Opening: who, where and when","Paragraph 2: what happened first","Paragraph 3: what happened next, or what went wrong","Ending: how the day finished and how you felt"],check:["I wrote four paragraphs","My opening says who, where and when","Each paragraph is about one part of the day","My ending looks back on the whole day"],mins:7}},
+/* 2 */{t:"Linking paragraphs through time",
+ learn:"In a recount or a story, the first words of a paragraph often tell the reader how time has moved on: “After lunch,” “Later that night,” “By the evening,”. These are time adverbials. They glue paragraphs together, and they are followed by a comma.",
+ tasks:[MC("Paragraph 1 ends: “…we put up our tents as the sun went down.” Which is the best start for paragraph 2?",["Later that night,","Firstly,","In conclusion,","On the other hand,"],"“Later that night” moves the reader on in time from the sunset."),
+  MC("Which of these is NOT a time adverbial?",["Under the table","After breakfast","Three days later","Meanwhile"],"“Under the table” tells you where, not when."),
+  ORD("diary")],
+ write:{p:"Write four short paragraphs about a school day. Start each paragraph with a different time adverbial followed by a comma.",plan:["Paragraph 1 starts with… (for example: This morning,)","Paragraph 2 starts with…","Paragraph 3 starts with…","Paragraph 4 starts with…"],check:["Four paragraphs","Four different time adverbials","A comma after each adverbial","The events are in the right order"],mins:7}},
+/* 3 */{t:"Instructions",
+ learn:"Instructions have a title that says the goal, a list of what you need, and steps in order. Each step starts with a command verb such as “fill”, “cut” or “stir”. Words like first, next, then and finally keep the steps in order.",
+ tasks:[ORD("sunflower"),
+  MC("Which sentence is written as an instruction?",["Fill the pot with compost.","I filled the pot with compost.","The pot was filled with compost.","Pots are useful for plants."],"It starts with a command verb, “Fill”, telling the reader what to do."),
+  MC("Where does the list of things you need belong?",["Before the steps","After the last step","In the middle of the steps","Instructions don’t need one"],"The reader needs to gather everything before starting.")],
+ write:{p:"Write instructions for making a sandwich, or another simple snack.",plan:["Title: How to…","You will need:","Steps 1 to 5, each starting with a command verb","A final tip"],check:["My title says the goal","I listed what you need first","Every step starts with a command verb","I used order words like first, next and finally"],mins:6}},
+/* 4 */{t:"News reports",
+ learn:"A news report has a headline, then an opening paragraph that answers who, what, where and when. Next come paragraphs of detail, often with a quotation from a witness. The ending says what will happen next. Reports are written in the past tense.",
+ tasks:[ORD("library"),
+  MC("Which question would the opening paragraph of a news report NOT usually answer?",["What is the reporter’s favourite food?","Who was involved?","What happened?","Where did it happen?"],"The opening gives the key facts of the story, not facts about the reporter."),
+  MC("Why do news reports include a quotation?",["To give a witness’s own words and make the report believable","To make the report longer","Because reports must rhyme","To tell the reader what to do"],"A real person’s words make the story feel true and add detail.")],
+ write:{p:"Write a short news report with the headline “Giant pumpkin found in school garden”.",plan:["Headline","Opening: who, what, where and when","Detail: what happened and how it was found","Quotation from a witness","Ending: what will happen next"],check:["My opening answers who, what, where and when","I included a quotation with inverted commas","I wrote in the past tense","My ending looks ahead"],mins:7}},
+/* 5 */{t:"Persuasive letters",
+ learn:"A persuasive letter says what you want in the opening paragraph. Each reason gets its own paragraph, introduced with words like “Firstly” and “Furthermore”. Strong letters answer an objection, then finish with a clear, polite request.",
+ tasks:[ORD("letter"),
+  MC("Which phrase would best introduce a second reason?",["Furthermore,","Once upon a time,","Yesterday,","In the beginning,"],"“Furthermore” adds another point to your argument."),
+  MC("Why does the letter mention that some people may worry a garden would be too much work?",["It shows the writer has thought about the other side, which makes the argument stronger","It is a mistake and should be removed","To make the reader worried","To fill up space"],"Answering an objection before the reader raises it makes you more convincing.")],
+ write:{p:"Write a letter to your headteacher asking for something you think would improve your school.",plan:["Opening: what you are asking for","Reason 1","Reason 2","An objection someone might raise, and your answer","Ending: a polite request, then a sign-off"],check:["My request is clear in the opening","Each reason has its own paragraph","I used linking words like Firstly, Furthermore and However","I ended politely"],mins:8}},
+/* 6 */{t:"Story structure",
+ learn:"Most stories have five parts: an opening that introduces the character and setting, a build-up where things start to happen, a problem or turning point, a resolution where it is sorted out, and an ending. Each part usually gets its own paragraph.",
+ tasks:[ORD("door"),
+  MC("What usually happens in the build-up of a story?",["Events start to lead towards the problem","The story finishes","The characters say goodbye","The author lists the characters"],"The build-up creates interest and leads towards the problem."),
+  MC("A strong ending often…",["links back to the opening or shows how the character has changed","introduces a brand new character","starts a new problem with no answer","repeats the title"],"Linking back makes the story feel complete.")],
+ write:{p:"Plan a five-part story called “The Message in a Bottle”. Then write only the opening and the build-up.",plan:["Opening: character and setting","Build-up","Problem","Resolution","Ending"],check:["All five parts are planned","My opening introduces the character and the setting","My build-up leads towards the problem","I started a new paragraph for the build-up"],mins:7}},
+/* 7 */{t:"Reports grouped by topic",
+ learn:"A non-chronological report gives facts about one subject. It has an introduction, then paragraphs grouped by topic (often with subheadings), and a conclusion. Because the middle paragraphs aren’t about time, they could go in a different order.",
+ tasks:[MC("Which paragraph is the introduction?",["A","B","C","D"],"Paragraph A says what hedgehogs are and where they live, which sets up the whole report.","hedgehogs"),
+  MC("Which subheading fits paragraph C best?",["Diet","Appearance","Behaviour","Habitat"],"Paragraph C is all about what hedgehogs eat.","hedgehogs"),
+  MC("Why could paragraphs B, C and D swap places, but paragraph A could not?",["The middle paragraphs are grouped by topic, not time, but the introduction has to come first","Because B, C and D are shorter","Because A has the most full stops","They couldn’t swap at all"],"Topic paragraphs don’t depend on each other’s order. The introduction sets up the whole report.","hedgehogs")],
+ write:{p:"Write a short report about an animal or a hobby you know well. Write the introduction and one topic paragraph with a subheading. Plan the rest.",plan:["Introduction: what it is, in one or two sentences","Subheading 1 and its facts","Subheading 2 (plan only)","Subheading 3 (plan only)","Conclusion (plan only)"],check:["My introduction says what the report is about","I used a subheading","My paragraph sticks to one topic","I wrote facts in the present tense"],mins:6}},
+/* 8 */{t:"Linking ideas between paragraphs",
+ learn:"Paragraphs feel connected when the first sentence of a new paragraph links back to the one before. You can use an adverbial such as “As a result,” “In contrast,” or “Meanwhile,”, or refer back with words like “This problem” or “Despite this”.",
+ tasks:[MC("Paragraph 1: “The village had no shop and only one bus a day.” Paragraph 2 starts: “___ most families moved to the town.”",["As a result,","In contrast,","For example,","Meanwhile,"],"Families moving away was caused by the lack of shops and buses."),
+  MC("Paragraph 1: “Lions hunt mostly at night.” Paragraph 2 starts: “___ cheetahs hunt during the day.”",["In contrast,","As a result,","Therefore,","For example,"],"The two facts are opposites, so you need a contrast."),
+  MC("Paragraph 1: “Sam searched the attic for hours.” Paragraph 2 starts: “___ his sister was quietly reading the map downstairs.”",["Meanwhile,","Therefore,","Firstly,","As a result,"],"“Meanwhile” shows two things happening at the same time."),
+  MC("Paragraph 1: “The river flooded the main road.” Paragraph 2 starts: “___ meant the bus had to take the long way round.”",["This flooding","Those flooding","Their flooding","These flooding"],"“This flooding” points back to what happened in the last paragraph.")],
+ write:{p:"Write three short paragraphs about your favourite season. Start paragraphs 2 and 3 with a linking adverbial that connects back to the paragraph before.",plan:["Paragraph 1: what the season is like","Paragraph 2 starts with…","Paragraph 3 starts with…"],check:["Three paragraphs","Paragraphs 2 and 3 start with a linking adverbial","Each link makes sense with the paragraph before","A comma after each adverbial"],mins:6}},
+/* 9 */{t:"Balanced arguments",
+ learn:"A balanced argument looks at both sides of a question. The introduction explains the question, one paragraph gives the arguments for, one gives the arguments against, and the conclusion is where the writer finally gives their own view.",
+ tasks:[ORD("phones"),
+  MC("Where should the writer give their own opinion in a balanced argument?",["In the conclusion","In the introduction","In every paragraph","Nowhere at all"],"The rest of the piece is fair to both sides. The conclusion is for your view."),
+  MC("Which pair of phrases introduces the two sides?",["On the one hand… On the other hand…","Once upon a time… The end","Dear Sir… Yours faithfully","Mix… Stir…"],"These phrases signal two opposite points of view.")],
+ write:{p:"Write a balanced argument: “Should homework be banned?”",plan:["Introduction: the question","Arguments for","Arguments against","Conclusion: your view and why"],check:["Four paragraphs","Both sides are explained fairly","I used “On the one hand” and “On the other hand”","My opinion is only in the conclusion"],mins:8}},
+/* 10 */{t:"Explanations",
+ learn:"An explanation tells the reader how or why something happens. It opens with what is being explained, then goes step by step through causes and effects, using words like “because”, “so” and “as a result”. It is usually written in the present tense.",
+ tasks:[ORD("rainbow"),
+  MC("Which words show cause and effect?",["because, so, as a result","once upon a time","dear, yours sincerely","mix, stir, pour"],"These words show why one thing leads to another."),
+  MC("Explanations are usually written in…",["the present tense","the future tense","the form of a poem","speech marks"],"They describe how things happen in general, so the present tense fits.")],
+ write:{p:"Write an explanation: “Why do we have day and night?” Useful facts: the Earth spins once every 24 hours; the side facing the Sun has day; the side facing away has night.",plan:["Opening: what you will explain","Step 1: the Earth spins","Step 2: the side facing the Sun","Step 3: the side facing away","Ending: so every place has day and night in each 24 hours"],check:["My opening says what I am explaining","My steps are in a logical order","I used because, so or as a result","Present tense throughout"],mins:7}},
+/* 11 */{t:"Openings that hook + fronted adverbials",
+ learn:"You can hook a reader with action, dialogue, a question or a vivid description. Avoid openings like “This story is about…”. Sentence skill: a fronted adverbial comes at the start of a sentence and is followed by a comma: “Without a sound, the fox crept away.”",
+ tasks:[MC("Which opening uses action to hook the reader?",["Maya sprinted through the gate as the bell began to ring.","This story is about a girl called Maya.","It was a nice day.","Maya was a girl."],"Something is happening straight away, so the reader wants to know why."),
+  MC("Which is the weakest opening?",["This story is about a dragon.","Smoke curled out of the cave mouth.","“Don’t go in there,” whispered Leo.","Have you ever seen a dragon sneeze?"],"It tells the reader what the story is about instead of pulling them in."),
+  MC("Which sentence punctuates the fronted adverbial correctly?",["Without a sound, the fox crept away.","Without a sound the fox, crept away.","Without, a sound the fox crept away.","Without a sound the fox crept, away."],"The comma goes straight after the fronted adverbial.")],
+ write:{p:"Write three different openings for a story called “The Storm”: one with action, one with dialogue, one with description. Then put a star next to your best one.",plan:["Action opening idea","Dialogue opening idea","Description opening idea"],check:["Three different openings","None of them starts “This story is about”","At least one has a fronted adverbial with a comma","I starred my best one"],mins:6}},
+/* 12 */{t:"Endings that link back + subordinate clauses",
+ learn:"A satisfying ending often echoes the opening or shows how a character has changed. Sentence skill: a subordinating conjunction (because, although, when, if, while, until, since) adds a clause that can’t stand on its own: “Although it was cold, we went swimming.”",
+ tasks:[MC("A story opens with a lost dog called Biscuit. Which ending links back best?",["That night, Biscuit curled up on his old blanket as if he had never been away.","The end.","Then everyone went home.","Suddenly, a dragon appeared."],"It returns to Biscuit and closes the problem from the opening."),
+  MC("Which word best joins “We stayed inside” and “it was raining”?",["because","although","unless","until"],"Staying inside happened as a result of the rain."),
+  MC("Which sentence contains a subordinate clause?",["Although it was cold, we went swimming.","It was cold and we went swimming.","We went swimming.","It was cold. We went swimming."],"“Although it was cold” can’t stand on its own as a sentence.")],
+ write:{p:"Write an ending for your Message in a Bottle story from Day 6 that links back to the opening. Include one sentence starting with “Although” or “When”.",plan:["How did your opening begin?","What has changed for the character?","Final sentence idea"],check:["My ending links back to the opening","It shows how the character has changed or what they feel","I used a sentence starting with Although or When","A comma after the subordinate clause"],mins:6}},
+/* 13 */{t:"Avoiding repetition + relative clauses",
+ learn:"Repeating the same noun again and again makes writing clunky. Use pronouns (he, it, they) and other names for the same thing (the dragon, the beast, the creature). Sentence skill: relative clauses start with who, which, where, whose or that, and add information about a noun.",
+ tasks:[MC("Which version avoids repetition best?",["The dragon flew over the hill. It landed on the rocks, and the enormous beast let out a roar.","The dragon flew over the hill. The dragon landed. The dragon roared.","Dragon flew. Dragon landed. Dragon roared.","The dragon flew over the hill and the dragon landed and the dragon roared."],"It uses “it” and “the enormous beast” instead of repeating “the dragon”."),
+  MC("“The girl ___ won the race is my cousin.”",["who","which","where","whose"],"Use “who” for people."),
+  MC("“The museum, ___ opened in 1902, is free to visit.”",["which","who","where","whose"],"Use “which” for things.")],
+ write:{p:"Write one paragraph describing an interesting character. Use at least two relative clauses, and refer to the character in three different ways (their name, a pronoun and a description).",plan:["Name","Pronoun","Another way to refer to them (for example: the old sailor)","Relative clause 1","Relative clause 2"],check:["Two relative clauses","The character is referred to in three ways","No noun repeated in back-to-back sentences","Commas around any extra-information clauses"],mins:6}},
+/* 14 */{t:"Topic sentences + expanded noun phrases",
+ learn:"In non-fiction, the first sentence of a paragraph usually tells the reader what the paragraph is about. That is the topic sentence. Sentence skill: an expanded noun phrase adds detail to a noun, for example “the tall, crooked tower on the hill”.",
+ tasks:[MC("Choose the best topic sentence for this paragraph: “___ They dive deep under the water and catch fish, squid and krill with their sharp beaks.”",["Penguins are skilled hunters in the water.","Penguins cannot fly.","Some zoos keep penguins.","Penguins have black and white feathers."],"The rest of the paragraph is all about hunting."),
+  MC("Which is an expanded noun phrase?",["the tall, crooked tower on the hill","the tower","it towered","towering over"],"It adds adjectives and a phrase to the noun “tower”."),
+  MC("What does a topic sentence do?",["Tells the reader what the paragraph is about","Ends the paragraph","Gives a quotation","Asks the reader to reply"],"Everything else in the paragraph should fit under it.")],
+ write:{p:"Write two paragraphs of a report about a place you know (a park, a town, a beach). Start each with a topic sentence and include two expanded noun phrases.",plan:["Paragraph 1 topic sentence","Paragraph 2 topic sentence","Expanded noun phrase 1","Expanded noun phrase 2"],check:["Each paragraph starts with a topic sentence","The rest of each paragraph matches its topic sentence","Two expanded noun phrases","Present tense"],mins:6}},
+/* 15 */{t:"Review: a whole story",
+ learn:"Today you bring it together: plan five parts, give each one its own paragraph, link the paragraphs with adverbials, hook the reader at the start and link back at the end.",
+ tasks:[MC("Which change needs a new paragraph?",["The story moves on to the next morning","A sentence gets long","You use a comma","You use an adjective"],"A change of time means a new paragraph."),
+  MC("Which is the best start for the paragraph after a problem has been solved?",["At last,","Once upon a time,","Firstly,","Dear Sir,"],"“At last” signals relief and the resolution."),
+  MC("Which opening hooks the reader best?",["The lights flickered once, twice, then died.","This is a story about a power cut.","It was a day.","My story is good."],"Something happens straight away, and the reader wants to know what comes next.")],
+ write:{p:"Plan and write a short story called “The Day the Lights Went Out”. Keep each paragraph to two or three sentences.",plan:["Opening","Build-up","Problem","Resolution","Ending that links back"],check:["Five paragraphs","A hooking opening","Linking adverbials between paragraphs","An ending that links back to the opening"],mins:10}},
+/* 16 */{t:"Parenthesis + short paragraphs",
+ learn:"Parenthesis adds extra information to a sentence using brackets, commas or dashes. If you take it out, the sentence still makes sense: “Mount Everest (the highest mountain in the world) is in the Himalayas.” Structure tip: a very short paragraph can create suspense or highlight a moment.",
+ tasks:[MC("Which sentence uses brackets correctly?",["Mount Everest (the highest mountain in the world) is in the Himalayas.","Mount Everest (the highest mountain) in the world is in the Himalayas.","Mount Everest the highest mountain in the world (is in the Himalayas).","Mount Everest the highest (mountain in the world is) in the Himalayas."],"Take the brackets out and the sentence still makes sense."),
+  MC("Which sentence uses commas for parenthesis correctly?",["My uncle, who lives in Wales, keeps bees.","My uncle who lives, in Wales keeps bees.","My, uncle who lives in Wales keeps bees.","My uncle who lives in Wales, keeps, bees."],"The commas go round the extra information, in a pair."),
+  MC("Why might a writer use a one-sentence paragraph?",["To create suspense or highlight a moment","Because they forgot to finish","To start a list","It is always a mistake"],"Its shortness makes the reader pause.")],
+ write:{p:"Write a paragraph about a famous place or person. Include two pieces of parenthesis: one in brackets and one between commas or dashes.",plan:["Subject","Extra information 1 (brackets)","Extra information 2 (commas or dashes)"],check:["Two pieces of parenthesis","Each sentence still makes sense without them","Brackets, commas or dashes used in pairs"],mins:5}},
+/* 17 */{t:"Sentence length for effect",
+ learn:"Long sentences can build up detail and tension. A short sentence after them hits hard: “The floorboards creaked as I crept along the dark landing, holding my breath and feeling for the wall. Then the door slammed.”",
+ tasks:[MC("Which pair builds tension best?",["I crept along the landing, feeling for the wall in the dark. Something moved.","I walked. I walked. I walked.","I went upstairs and it was dark and I was scared and then something moved.","The landing was long. The landing was dark."],"A long, careful sentence followed by a short shock."),
+  MC("Why might a writer use a one-word sentence such as “Silence.”?",["For dramatic effect","Because they ran out of words","To list items","To ask a question"],"It makes the reader stop on that moment."),
+  MC("Where is a short, punchy sentence most effective in a story?",["At a moment of surprise or tension","In the title","In every sentence","Only in the first line"],"Used everywhere, short sentences lose their power.")],
+ write:{p:"Write one paragraph: a character hears a noise in the night. Mix long and short sentences, and end with a very short one.",plan:["Long sentence building the scene","The noise","Short sentence for the ending"],check:["At least two long sentences","At least two short sentences","The paragraph ends with a short sentence","Commas in the long sentences where needed"],mins:5}},
+/* 18 */{t:"Formal writing + the passive voice",
+ learn:"Formal letters and reports avoid chatty words and contractions (write “do not”, not “don’t”). The passive voice is useful when the action matters more than who did it: “The window was broken.” instead of “Someone broke the window.”",
+ tasks:[MC("Which sentence is in the passive voice?",["The window was broken by the ball.","The ball broke the window.","I broke the window.","The window is big."],"The window (the thing the action happens to) comes first, with “was broken”."),
+  MC("Which sentence is the most formal?",["I would be grateful if you could reply.","Get back to me asap.","Write back, yeah?","Reply soon!!"],"Polite, full words and no slang."),
+  MC("Which sign-off suits a formal letter to someone whose name you know?",["Yours sincerely,","See ya,","Love from,","Bye!"],"“Yours sincerely” is used when you have written “Dear” and the person’s name.")],
+ write:{p:"Write a formal letter to your local council about litter in a park, in three paragraphs: the problem, a suggestion, and a polite request. Include at least one passive sentence.",plan:["The problem","Your suggestion","Polite request and sign-off","Passive sentence idea"],check:["Three paragraphs","No contractions or chatty words","At least one passive sentence","A formal sign-off"],mins:7}},
+/* 19 */{t:"Colons and semi-colons",
+ learn:"A semi-colon joins two closely linked clauses that could each be a sentence: “It was late; we hurried home.” A colon introduces a list or an explanation: “I knew what to bring: a torch, a map and a coat.” Structure tip: the conclusion of a balanced argument often starts with “Overall,” or “In conclusion,”.",
+ tasks:[MC("Which uses a semi-colon correctly?",["It was late; we hurried home.","It was; late we hurried home.","It; was late we hurried home.","It was late we; hurried home."],"Both sides of the semi-colon could be sentences on their own."),
+  MC("Which uses a colon correctly?",["I knew what to bring: a torch, a map and a coat.","I knew: what to bring a torch, a map and a coat.","I: knew what to bring a torch, a map and a coat.","I knew what to bring a torch: a map and a coat."],"The colon comes before the list."),
+  MC("Which phrase best starts the conclusion of a balanced argument?",["Overall,","Once upon a time,","Firstly,","Dear Sir,"],"“Overall” signals that you are weighing everything up.")],
+ write:{p:"Write a balanced argument in four short paragraphs: “Should school start an hour later?” Include one semi-colon and one colon.",plan:["Introduction","For","Against","Conclusion (Overall, …)"],check:["Four paragraphs","One semi-colon joining two linked clauses","One colon before a list or explanation","The conclusion gives my view"],mins:8}},
+/* 20 */{t:"Review: a news report with sentence skills",
+ learn:"Put whole-piece structure and the sentence skills together: a clear opening, linked paragraphs, a quotation, and a mix of fronted adverbials, relative clauses and parenthesis.",
+ tasks:[MC("Which opening paragraph suits a news report?",["Yesterday afternoon, a pet tortoise escaped from a house in Elm Street and was found two miles away.","Once upon a time there was a tortoise.","Tortoises are reptiles with shells.","Have you ever owned a tortoise? You should!"],"It answers who, what, where and when."),
+  MC("Which sentence has a relative clause?",["The tortoise, which is 40 years old, is now safe at home.","The tortoise is safe.","The tortoise is old and safe.","Safe at home, the tortoise slept."],"“which is 40 years old” adds information about the tortoise."),
+  MC("Which sentence starts with a fronted adverbial?",["Early this morning, the tortoise was spotted by a jogger.","The tortoise was spotted by a jogger.","A jogger spotted the tortoise.","The jogger, who was running, spotted it."],"“Early this morning,” comes first and is followed by a comma.")],
+ write:{p:"Write a news report: “Escaped tortoise found two miles from home”. Include a quotation, a relative clause and a fronted adverbial.",plan:["Headline","Opening: who, what, where, when","Detail","Quotation","What happens next"],check:["My opening answers who, what, where and when","The quotation is punctuated correctly","At least one relative clause","At least one fronted adverbial with a comma"],mins:8}},
+/* 21 */{t:"Main and subordinate clauses",
+ learn:"A main clause makes sense on its own. A subordinate clause adds information but can’t stand alone. It can go at the start, in the middle or at the end: “When the bell rang, the children ran outside.” If it comes first, put a comma after it.",
+ tasks:[MC("In “When the bell rang, the children ran outside.”, which is the main clause?",["the children ran outside","When the bell rang","When","the bell rang outside"],"“The children ran outside” makes sense on its own."),
+  MC("Which sentence has the subordinate clause at the end?",["We played football until it got dark.","Until it got dark, we played football.","We played football.","It got dark."],"“until it got dark” comes after the main clause."),
+  MC("Which sentence is punctuated correctly?",["If it rains tomorrow, we will stay inside.","If it rains tomorrow we, will stay inside.","If, it rains tomorrow we will stay inside.","If it rains tomorrow we will, stay inside."],"The comma comes straight after the subordinate clause.")],
+ write:{p:"Write two short paragraphs about a sports day. Include four sentences with subordinate clauses, with at least one at the start and one at the end.",plan:["Paragraph 1: the morning","Paragraph 2: the races","Subordinate clause at the start","Subordinate clause at the end"],check:["Two paragraphs","Four subordinate clauses","A comma after each clause that comes first","Every sentence has a main clause"],mins:6}},
+/* 22 */{t:"Relative clauses in the middle",
+ learn:"A relative clause can sit in the middle of a sentence, between commas: “The boy, who had forgotten his coat, shivered at the bus stop.” Use who for people, which for things, where for places and whose for belonging.",
+ tasks:[MC("Which sentence has a relative clause in the middle?",["The boy, who had forgotten his coat, shivered at the bus stop.","The boy shivered at the bus stop.","The boy shivered because he had forgotten his coat.","Shivering, the boy waited."],"“who had forgotten his coat” sits between commas in the middle."),
+  MC("“That is the café ___ we met.”",["where","who","whose","which"],"Use “where” for places."),
+  MC("“My friend, ___ dog is called Max, lives next door.”",["whose","who","where","which"],"Use “whose” for something that belongs to someone.")],
+ write:{p:"Describe your school in one paragraph using three relative clauses, with at least one in the middle of a sentence between commas.",plan:["A person to describe","A place to describe","A thing to describe"],check:["Three relative clauses","At least one in the middle, between commas","The right word each time (who, which, where, whose)"],mins:5}},
+/* 23 */{t:"Varying sentence openers",
+ learn:"Writing feels flat when every sentence starts the same way. Mix your openers: a subordinate clause (As the sun set,), an adverb (Slowly,), an -ing word (Opening the box,), or a prepositional phrase (Under the bridge,).",
+ tasks:[MC("Which sentence starts with a subordinate clause?",["As the sun set, the birds fell silent.","The birds fell silent.","Slowly, the birds fell silent.","Birds fell silent at sunset."],"“As the sun set” has a verb but can’t stand alone."),
+  MC("Which is the best way to combine “He opened the box. He gasped.”?",["Opening the box, he gasped.","He opened the box he gasped.","He opened, the box gasped.","Opened box, gasped."],"An -ing opener joins the two actions smoothly."),
+  MC("Which opener is a prepositional phrase?",["Under the bridge,","Quickly,","Although it was late,","Shouting loudly,"],"“Under” is a preposition telling you where.")],
+ write:{p:"Write a paragraph about a chase. No two sentences may start the same way. Use at least three different kinds of opener.",plan:["Opener 1 (subordinate clause)","Opener 2 (adverb)","Opener 3 (-ing word)","Opener 4 (prepositional phrase)"],check:["No two sentences start the same way","Three different kinds of opener","A comma after each opener"],mins:5}},
+/* 24 */{t:"However, therefore and other linking adverbs",
+ learn:"Words like however, therefore and in addition link ideas, but they can’t join two clauses the way a conjunction does. Start a new sentence and add a comma: “It was sunny. However, it was very cold.”",
+ tasks:[MC("Which sentence punctuates “however” correctly?",["It was sunny. However, it was very cold.","It was sunny however it was very cold.","It was sunny, however it was very cold.","However it was sunny it was very cold."],"“However” starts a new sentence and is followed by a comma."),
+  MC("Which word is a co-ordinating conjunction that joins two equal clauses?",["but","however","therefore","meanwhile"],"“but” can join two clauses in one sentence."),
+  MC("Choose the best link: “Cats sleep for much of the day. ___, dogs often need long walks.”",["On the other hand","As a result","Therefore","For example"],"The two facts contrast with each other.")],
+ write:{p:"Write two paragraphs comparing two pets. Use However, In addition and On the other hand, punctuated correctly.",plan:["Paragraph 1: pet A","Paragraph 2: pet B","Where “However” goes","Where “In addition” goes"],check:["Two paragraphs","However, In addition and On the other hand all used","Each followed by a comma","Each starts a new sentence"],mins:6}},
+/* 25 */{t:"Laying out dialogue",
+ learn:"Speech goes inside inverted commas, with its punctuation inside too: “Where are you going?” asked Dad. Start a new line every time a different person speaks. That is a structure rule as well as a punctuation one.",
+ tasks:[MC("Which is punctuated correctly?",["“Where are you going?” asked Dad.","“Where are you going” asked Dad?","Where are you going? “asked Dad.”","“Where are you going”? asked Dad."],"The question mark belongs inside the inverted commas."),
+  MC("When must you start a new line in dialogue?",["Each time a different person speaks","After every three lines","Only when someone shouts","Never"],"New speaker, new line."),
+  MC("Which is punctuated correctly?",["“I’m hungry,” said Leo.","“I’m hungry.” said Leo.","“I’m hungry” said Leo.","I’m hungry, “said Leo.”"],"A comma, not a full stop, before “said Leo”, and it goes inside the inverted commas.")],
+ write:{p:"Write a short conversation between two characters who have found something strange. At least six lines of speech, with some action between the lines.",plan:["Character 1","Character 2","What they found","How the conversation ends"],check:["A new line for each speaker","Punctuation inside the inverted commas","Some action or description between the speech","At least six lines of speech"],mins:6}},
+/* 26 */{t:"Modal verbs and possibility",
+ learn:"Modal verbs (will, must, should, could, might, may) show how certain or necessary something is. Adverbs such as perhaps, surely and definitely do the same. Persuasive writing uses strong ones; balanced writing uses careful ones.",
+ tasks:[MC("Which word shows the strongest certainty?",["will","might","could","may"],"“will” leaves no doubt."),
+  MC("Which sentence uses an adverb of possibility?",["Perhaps we should wait.","We waited.","We should wait.","Wait!"],"“Perhaps” shows how likely something is."),
+  MC("Which sentence persuades most strongly?",["We must protect our parks.","We might protect our parks.","Parks could be protected.","Perhaps parks are nice."],"“must” is the strongest modal verb here.")],
+ write:{p:"Write a persuasive paragraph arguing for a new playground. Use at least three modal verbs and one adverb of possibility.",plan:["Main claim","Reason 1","Reason 2","Strong final sentence"],check:["Three modal verbs","One adverb of possibility","A clear main claim","A strong final sentence"],mins:5}},
+/* 27 */{t:"The subjunctive and formal reports",
+ learn:"The subjunctive is a formal verb form used for wishes and imagined situations: “If I were you, I would apologise.” (not “If I was you”). Science reports often use the passive: “The water was heated.”",
+ tasks:[MC("Which sentence uses the subjunctive?",["If I were you, I would apologise.","If I was you, I would apologise.","I was sorry.","You were late."],"“If I were” is the subjunctive form."),
+  MC("Which sentence is passive?",["The water was heated for five minutes.","We heated the water for five minutes.","Heat the water for five minutes.","The water is hot."],"The water comes first, and we are not told who heated it."),
+  MC("Which sentence suits a science report best?",["The temperature was recorded every minute.","We like science lots!","It was boiling, wow!","Then I did the next bit."],"Formal, precise and passive.")],
+ write:{p:"Write up a simple experiment (for example, which material keeps an ice cube frozen longest) in three short paragraphs: what was done, what was found, and a conclusion. Use the passive at least twice.",plan:["Method: what was done","Results: what was found","Conclusion"],check:["Three paragraphs","Two passive sentences","Formal language","Past tense for what was done"],mins:7}},
+/* 28 */{t:"Review: holding a whole piece together",
+ learn:"A well-structured piece has an opening that sets it up, paragraphs that each do one job, links between them, and an ending that ties it together. Put this jumbled story back together, and notice which words helped you.",
+ tasks:[ORD("river"),
+  MC("In that story, which word in paragraph 4 signals a change of direction?",["however","afternoon","cracks","everyone"],"“however” tells the reader that things are about to go differently."),
+  MC("How does the ending link back to the opening?",["Ana will now be one of the people who tell the story of the year the river froze","It describes the chestnut stall","It introduces a new character","It doesn’t link back"],"The opening was about old people telling the story; now Ana will tell it.")],
+ write:{p:"Pick any piece you have written this month. Rewrite its opening and its ending so they link to each other. Then check every paragraph starts with a link back.",plan:["Which piece?","New opening","New ending that echoes it"],check:["The opening and ending link","Each paragraph starts with a link back","Each paragraph does one job"],mins:6}},
+/* 29 */{t:"Persuasion with every tool",
+ learn:"Today’s persuasive piece uses everything: a clear opening, one reason per paragraph, an answered objection and a strong ending, plus sentence variety with subordinate clauses, relative clauses, parenthesis and a semi-colon.",
+ tasks:[MC("Which sentence contains both a relative clause and a modal verb?",["Children, who need fresh air, should play outside every day.","Children play outside.","Play outside!","Children played outside yesterday."],"“who need fresh air” is the relative clause and “should” is the modal verb."),
+  MC("Which is the best way to answer an objection?",["Some people say it would cost too much. However, the money could come from the summer fair.","Some people are wrong.","Nobody disagrees with me.","It costs too much."],"It states the worry fairly, then answers it."),
+  MC("Which punctuation mark could join “Our park is old” and “the swings are broken”?",["a semi-colon","a question mark","inverted commas","an apostrophe"],"Both parts could be sentences, and they are closely linked.")],
+ write:{p:"Write a persuasive letter or speech: “Our town needs a new park.” Four or five paragraphs.",plan:["Opening: what you want","Reason 1","Reason 2","Objection and your answer","Strong ending"],check:["One reason per paragraph","An objection answered","A subordinate clause, a relative clause and parenthesis","A semi-colon used correctly"],mins:10}},
+/* 30 */{t:"Final piece: a complete story",
+ learn:"Last day. Write a complete short story with five parts, linked paragraphs, a hooking opening, an ending that links back and varied sentences. Then tick, honestly, what you managed.",
+ tasks:[MC("Which sentence opens with an -ing word?",["Grabbing her coat, Zara ran outside.","Zara grabbed her coat.","Zara ran outside.","Her coat was grabbed."],"“Grabbing her coat,” is an -ing opener followed by a comma."),
+  MC("Which is the best link between a problem paragraph and a resolution paragraph?",["When all seemed lost,","Once upon a time,","Firstly,","Dear Sir,"],"It marks the turning point towards the resolution."),
+  MC("A story opens with Zara afraid of the dark. Which ending is most satisfying?",["That night, for the first time, Zara switched off the light herself.","The end.","Zara went to bed.","Suddenly, it was morning and there was a new problem."],"It shows how Zara has changed since the opening.")],
+ write:{p:"Write a complete short story called “The Key That Didn’t Fit”. Five paragraphs.",plan:["Opening that hooks","Build-up","Problem","Resolution","Ending that links back"],check:["Five paragraphs, each doing one job","A hooking opening and an ending that links back","Linking adverbials between paragraphs","Varied sentence openers and at least one relative clause"],mins:10}}
+];
+
+/* ---------- course engine ---------- */
+var KEY_COURSE="satsp-course-v1";
+function cload(){return load(KEY_COURSE,{});}
+function cDay(n){return cload()[n]||{};}
+function cSave(n,patch){var c=cload();var d=c[n]||{};for(var k in patch)d[k]=patch[k];c[n]=d;store(KEY_COURSE,c);}
+function currentDay(){var c=cload();for(var i=1;i<=30;i++){if(!(c[i]&&c[i].done))return i;}return 31;}
+function courseMaths(n){
+  var long=COURSE[n-1].write.mins>=9;
+  var tier=n<=10?1:(n<=20?2:3);
+  return {level:n<=10?3:4,tier:tier,an:long?4:(n<=10?6:5),rn:long?2:3};
+}
+var timerId=null;
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
+
+function courseOpen(){var cur=currentDay();if(cur>30)courseAll();else dayScreen(cur);}
+function courseAll(){
+  stopTimer();S={view:"course-all"};
+  var c=cload(),cur=currentDay(),cells="";
+  for(var i=1;i<=30;i++){
+    var done=c[i]&&c[i].done,open=i<=cur;
+    cells+='<button class="daycell'+(done?" done":"")+(i===cur?" now":"")+'" data-act="day" data-n="'+i+'"'+(open?"":" disabled")+'><strong>'+(done?"✓ ":"")+'Day '+i+'</strong><span>'+esc(COURSE[i-1].t)+'</span></button>';
+  }
+  app.innerHTML='<button class="back" data-act="home">‹ Back</button><h2 style="margin-bottom:6px">30-day course</h2>'+
+    '<p class="muted" style="margin-bottom:14px">'+(cur>30?"All 30 days done.":"You can redo any finished day. The next day opens when today is complete.")+'</p><div class="days">'+cells+'</div>';
+}
+function dayScreen(n){
+  stopTimer();S={view:"day",day:n};
+  var d=COURSE[n-1],st=cDay(n),cm=courseMaths(n);
+  var mMin=Math.round((cm.an*PACE[cm.level-1]+cm.rn*90)/60);
+  var allDone=st.maths&&st.tried&&st.write;
+  if(allDone&&!st.done){
+    cSave(n,{done:true,when:nowStr()});st=cDay(n);
+    logSession({kind:"Course, day "+n,when:st.when,score:st.maths.s+st.tried.s,total:st.maths.t+st.tried.t});
+  }
+  function step(num,key,title,sub,act,res){
+    var done=!!st[key];
+    return '<div class="step'+(done?" sdone":"")+'"><div class="snum">'+(done?"✓":num)+'</div><div class="sbody"><h3>'+title+'</h3><p class="muted small">'+sub+'</p>'+(done?'<p class="small"><strong>'+res+'</strong></p>':'')+'</div>'+
+      '<button class="btn'+(done?" alt":"")+'" data-act="'+act+'" data-n="'+n+'">'+(done?"Redo":"Start")+'</button></div>';
+  }
+  var html='<div class="qtop"><button class="back" data-act="home">‹ Home</button><button class="back" data-act="course-all">All days ›</button></div>'+
+    '<p class="muted">Day '+n+' of 30</p><h2 style="margin-bottom:16px">'+esc(d.t)+'</h2><div class="steps">'+
+    step(1,"maths","Maths",cm.an+" sums at Level "+cm.level+", then "+cm.rn+" word problems. About "+mMin+" minutes.","c-maths",st.maths?st.maths.s+" / "+st.maths.t+" correct":"")+
+    step(2,"tried","Learn and try","Today’s idea, then a few questions. About 4 minutes.","c-try",st.tried?st.tried.s+" / "+st.tried.t+" correct":"")+
+    step(3,"write","Write",d.write.mins+" minutes of writing on paper, plus 2 minutes to plan.","c-write",st.write?st.write.ticks+" of "+st.write.total+" checklist points ticked":"")+
+    '</div>';
+  if(st.done){
+    html+='<div class="summary" style="margin-top:18px"><p class="muted">Day '+n+' complete, '+esc(st.when)+'</p>'+
+      '<dl><dt>Maths</dt><dd>'+st.maths.s+' / '+st.maths.t+(st.maths.missed&&st.maths.missed.length?" (missed: "+esc(st.maths.missed.join(", "))+")":"")+'</dd>'+
+      '<dt>Learn and try</dt><dd>'+st.tried.s+' / '+st.tried.t+'</dd>'+
+      '<dt>Writing checklist</dt><dd>'+st.write.ticks+' of '+st.write.total+'</dd></dl>'+
+      '<p class="muted small">Take a screenshot and send it to Dad, with a photo of your writing.</p></div>';
+    if(n<30)html+='<div class="row" style="margin-top:14px"><button class="btn sun" data-act="day" data-n="'+(n+1)+'">Go to Day '+(n+1)+'</button></div>';
+  }
+  app.innerHTML=html;
+}
+function courseMathsStart(n){
+  var cm=courseMaths(n);LEVEL=cm.level;
+  var items=[],gens=shuffle(GENS.slice()),rg=shuffle(RGENS.slice());
+  for(var i=0;i<cm.an;i++){var g=gens[i%gens.length];var it=g.make();it.type=g.name;items.push(it);}
+  for(var j=0;j<cm.rn;j++){var r=rg[j];var it2=r.make(cm.tier);it2.type=r.name;items.push(it2);}
+  S={view:"arith",items:items,i:0,input:"",right:0,missed:[],start:Date.now(),checked:false,course:n};
+  arithDraw();
+}
+function courseMathsDone(){
+  var n=S.course,secs=Math.round((Date.now()-S.start)/1000);
+  var seen={},missed=S.missed.filter(function(t){if(seen[t])return false;seen[t]=1;return true;});
+  cSave(n,{maths:{s:S.right,t:S.items.length,secs:secs,missed:missed}});
+  dayScreen(n);
+}
+
+/* learn and try */
+function tryStart(n){stopTimer();S={view:"try",day:n,i:-1,right:0,answered:false};tryDraw();}
+function ctxHTML(id){
+  var t=TEXTS[id];
+  return '<div class="ctx"><h3>'+esc(t.title)+'</h3>'+t.p.map(function(p,i){return '<p><strong>'+"ABCDE"[i]+'</strong> '+esc(p)+'</p>';}).join("")+'</div>';
+}
+function tryDraw(){
+  var d=COURSE[S.day-1];
+  var head='<div class="qtop"><button class="back" data-act="day" data-n="'+S.day+'">‹ Day '+S.day+'</button><span class="muted">'+(S.i<0?"Learn":(S.i+1)+" of "+d.tasks.length)+'</span></div>'+
+    '<div class="progress"><div style="width:'+(100*Math.max(0,S.i)/d.tasks.length)+'%"></div></div>';
+  if(S.i<0){
+    app.innerHTML=head+'<div class="panel"><p class="muted small">Today’s idea</p><h2 style="margin:4px 0 10px">'+esc(d.t)+'</h2><p>'+esc(d.learn)+'</p>'+
+      '<div class="row" style="margin-top:18px"><button class="btn" data-act="try-next">Start the questions</button></div></div>';
+    return;
+  }
+  var tk=d.tasks[S.i];
+  var nextBtn=S.answered?'<div class="row" style="margin-top:14px"><button class="btn" data-act="try-next">'+(S.i+1<d.tasks.length?"Next":"Finish")+'</button></div>':'';
+  if(tk.k==="mc"){
+    if(!S.perm)S.perm=shuffle(tk.o.map(function(x,i){return i;}));
+    var opts=S.perm.map(function(oi){
+      var cls="opt";
+      if(S.answered){if(oi===0)cls+=" right";else if(oi===S.chose)cls+=" wrong";}
+      return '<button class="'+cls+'" data-act="mc" data-o="'+oi+'"'+(S.answered?" disabled":"")+'>'+esc(tk.o[oi])+'</button>';
+    }).join("");
+    var fb="";
+    if(S.answered)fb='<p class="feedback '+(S.chose===0?"ok":"no")+'">'+(S.chose===0?"Correct. ":"Not quite. ")+'<span style="font-weight:400;color:var(--ink)">'+esc(tk.why)+'</span></p>';
+    app.innerHTML=head+(tk.ctx?ctxHTML(tk.ctx):"")+'<div class="panel"><p class="qline">'+esc(tk.q)+'</p><div class="opts">'+opts+'</div>'+fb+nextBtn+'</div>';
+  } else {
+    var t=TEXTS[tk.id],n=t.p.length;
+    if(!S.shuf){do{S.shuf=shuffle(t.p.map(function(x,i){return i;}));}while(S.shuf.every(function(v,i){return v===i;}));S.seq=[];}
+    var cards=S.shuf.map(function(pi){
+      var pos=S.seq.indexOf(pi),cls="ordcard"+(pos>=0?" picked":"");
+      if(S.answered)cls+=(S.seq[pos]===pos?" right":" wrong");
+      return '<button class="'+cls+'" data-act="ord" data-p="'+pi+'"'+(S.answered||pos>=0?" disabled":"")+'><span class="badge">'+(pos>=0?pos+1:"")+'</span><span>'+esc(t.p[pi])+'</span></button>';
+    }).join("");
+    var ctrl="";
+    if(!S.answered)ctrl='<div class="row" style="margin-top:12px"><button class="btn alt" data-act="ord-reset">Start again</button><button class="btn" data-act="ord-check"'+(S.seq.length<n?" disabled":"")+'>Check</button></div>';
+    var fb2="";
+    if(S.answered){
+      var ok=S.seq.every(function(v,i){return v===i;});
+      fb2='<p class="feedback '+(ok?"ok":"no")+'">'+(ok?"Correct, every paragraph in the right place.":"Not quite. Here is the right order:")+'</p>';
+      if(!ok)fb2+='<ol class="rightorder">'+t.p.map(function(p){return '<li>'+esc(p)+'</li>';}).join("")+'</ol>';
+    }
+    app.innerHTML=head+'<div class="panel"><p class="qline">Put the paragraphs of “'+esc(t.title)+'” in order. Tap the first paragraph, then the second, and so on.</p>'+
+      '<div class="ords">'+cards+'</div>'+ctrl+fb2+nextBtn+'</div>';
+  }
+}
+function tryNext(){
+  var d=COURSE[S.day-1];
+  S.i++;S.answered=false;S.perm=null;S.shuf=null;S.seq=[];S.chose=null;
+  if(S.i>=d.tasks.length){cSave(S.day,{tried:{s:S.right,t:d.tasks.length}});dayScreen(S.day);return;}
+  tryDraw();window.scrollTo(0,0);
+}
+
+/* write */
+function writeStart(n){stopTimer();S={view:"write",day:n};writeDraw();}
+function writeDraw(){
+  var w=COURSE[S.day-1].write,plans=load("satsp-plan-"+S.day,[]),ticks=load("satsp-ticks-"+S.day,[]);
+  app.innerHTML='<div class="qtop"><button class="back" data-act="day" data-n="'+S.day+'">‹ Day '+S.day+'</button><span class="muted">Write</span></div>'+
+    '<div class="panel"><p class="muted small">Your task</p><p class="qline" style="margin-top:4px">'+esc(w.p)+'</p></div>'+
+    '<div class="panel" style="margin-top:12px"><h3>1. Plan (2 minutes)</h3><p class="muted small" style="margin:4px 0 10px">A few words for each box is enough. You can plan on paper instead.</p>'+
+    w.plan.map(function(lbl,i){return '<label class="planbox"><span>'+esc(lbl)+'</span><textarea data-plan="'+i+'" rows="2">'+esc(plans[i]||"")+'</textarea></label>';}).join("")+'</div>'+
+    '<div class="panel" style="margin-top:12px"><h3>2. Write it on paper ('+w.mins+' minutes)</h3>'+
+    '<div class="row" style="margin-top:10px"><button class="btn sun" data-act="timer" data-m="'+w.mins+'">Start '+w.mins+'-minute timer</button><span class="timer" id="timer" aria-live="polite"></span></div></div>'+
+    '<div class="panel" style="margin-top:12px"><h3>3. Check your writing</h3><p class="muted small" style="margin:4px 0 10px">Tick only what you really did.</p>'+
+    w.check.map(function(c,i){return '<label class="tick"><input type="checkbox" data-tick="'+i+'"'+(ticks[i]?" checked":"")+'><span>'+esc(c)+'</span></label>';}).join("")+
+    '<div class="row" style="margin-top:14px"><button class="btn" data-act="write-done">Finish</button></div></div>';
+}
+function startTimer(mins){
+  stopTimer();var end=Date.now()+mins*60000;
+  function tick(){
+    var el=document.getElementById("timer");
+    if(!el||S.view!=="write"){stopTimer();return;}
+    var left=Math.max(0,Math.round((end-Date.now())/1000));
+    el.textContent=left>0?Math.floor(left/60)+":"+String(left%60).padStart(2,"0")+" left":"Time’s up. Finish your sentence, then check your work.";
+    if(left<=0)stopTimer();
+  }
+  tick();timerId=setInterval(tick,1000);
+}
+function writeDone(){
+  var w=COURSE[S.day-1].write,ticks=load("satsp-ticks-"+S.day,[]);
+  var n=w.check.filter(function(c,i){return ticks[i];}).length;
+  stopTimer();cSave(S.day,{write:{ticks:n,total:w.check.length}});dayScreen(S.day);
+}
+
+function courseTile(){
+  var cur=currentDay();
+  if(cur>30)return '<button class="tile course" data-act="course-all"><span class="sym">✓</span><span class="big">30-day course complete</span><span>Tap to look back at any day.</span></button>';
+  return '<button class="tile course" data-act="course"><span class="sym">Day '+cur+'</span><span class="big">'+esc(COURSE[cur-1].t)+'</span><span>Today’s course: maths, writing structure and a short piece of writing. About 15 to 20 minutes.</span></button>';
+}
+
 /* ---------- events ---------- */
 app.addEventListener("click",function(e){
   var k=e.target.closest("[data-key]");
   if(k){arithKey(k.dataset.key);return;}
   var el=e.target.closest("[data-act]");if(!el)return;
   var a=el.dataset.act;
-  if(a==="home")home();
+  if(a==="home"){stopTimer();home();}
+  else if(a==="course")courseOpen();
+  else if(a==="course-all")courseAll();
+  else if(a==="day")dayScreen(+el.dataset.n);
+  else if(a==="c-maths")courseMathsStart(+el.dataset.n);
+  else if(a==="c-try")tryStart(+el.dataset.n);
+  else if(a==="c-write")writeStart(+el.dataset.n);
+  else if(a==="try-next")tryNext();
+  else if(a==="mc"){if(S.answered)return;S.chose=+el.dataset.o;S.answered=true;if(S.chose===0)S.right++;tryDraw();}
+  else if(a==="ord"){if(S.answered)return;var pi=+el.dataset.p;if(S.seq.indexOf(pi)<0)S.seq.push(pi);tryDraw();}
+  else if(a==="ord-reset"){S.seq=[];tryDraw();}
+  else if(a==="ord-check"){if(S.seq.length<TEXTS[COURSE[S.day-1].tasks[S.i].id].p.length)return;S.answered=true;if(S.seq.every(function(v,i){return v===i;}))S.right++;tryDraw();}
+  else if(a==="timer")startTimer(+el.dataset.m);
+  else if(a==="write-done")writeDone();
   else if(a==="arith-setup")arithSetup();
   else if(a==="chip"){
     var g=el.dataset.g,i=chosen.indexOf(g);
@@ -608,9 +1182,17 @@ app.addEventListener("click",function(e){
     document.getElementById("exmsg").textContent=list.length?"Saved "+list.length+" word"+(list.length===1?"":"s")+".":"Saved.";
   }
 });
+app.addEventListener("input",function(e){
+  var t=e.target;
+  if(S.view==="write"&&t.dataset.plan!==undefined){var pl=load("satsp-plan-"+S.day,[]);pl[+t.dataset.plan]=t.value;store("satsp-plan-"+S.day,pl);}
+});
+app.addEventListener("change",function(e){
+  var t=e.target;
+  if(S.view==="write"&&t.dataset.tick!==undefined){var tk=load("satsp-ticks-"+S.day,[]);tk[+t.dataset.tick]=t.checked;store("satsp-ticks-"+S.day,tk);}
+});
 document.addEventListener("keydown",function(e){
   if(S.view==="arith"){
-    if(/^[0-9.\/ ]$/.test(e.key)){e.preventDefault();arithKey(e.key);}
+    if(/^[0-9.\/ -]$/.test(e.key)){e.preventDefault();arithKey(e.key);}
     else if(e.key==="Backspace"){e.preventDefault();arithKey("back");}
     else if(e.key==="Enter"){e.preventDefault();arithKey("enter");}
   } else if(S.view==="spell"&&e.key==="Enter"){e.preventDefault();spellCheck();}
